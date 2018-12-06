@@ -1,0 +1,41 @@
+{
+  "name": "TNM084-Project",
+  "version": "1.0.0",
+  "description": "three.js + webvr + typescript",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --inline --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/davjo664/threejs-web-vr"
+  },
+  "keywords": [],
+  "author": "Jesper Lund",
+  "license": "MIT",
+  "homepage": "",
+  "devDependencies": {
+    "awesome-typescript-loader": "latest",
+    "browser-sync": "latest",
+    "browser-sync-webpack-plugin": "latest",
+    "css-loader": "latest",
+    "extract-text-webpack-plugin": "latest",
+    "html-webpack-plugin": "latest",
+    "json-loader": "latest",
+    "progress-bar-webpack-plugin": "latest",
+    "style-loader": "latest",
+    "ts-shader-loader": "^1.0.5",
+    "typescript": "latest",
+    "webpack": "latest",
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "latest"
+  },
+  "dependencies": {
+    "@types/node": "^10.12.11",
+    "@types/three": "latest",
+    "orbit-controls-es6": "^2.0.0",
+    "three": "latest",
+    "three-obj-mtl-loader": "^1.0.3"
+  }
+}

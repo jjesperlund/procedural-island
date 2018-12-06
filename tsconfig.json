@@ -1,0 +1,30 @@
+{
+    "compilerOptions": {
+        "target": "es6",
+        "module": "commonjs",
+        "moduleResolution": "node",
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "preserveConstEnums": true,
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "./lib/",
+        "types": [
+            // add node as an option
+            "node"
+         ]
+    },
+    "awesomeTypescriptLoaderOptions": {
+        "useWebpackText": true,
+        "forkChecker": true,
+        "useCache": true
+    },
+    "exclude": [
+        "node_modules",
+        "lib"
+    ],
+    "compileOnSave": true,
+    "buildOnSave": false,
+    "atom": {
+        "rewriteTsconfig": false
+    }
+}
