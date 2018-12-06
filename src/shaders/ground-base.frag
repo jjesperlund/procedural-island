@@ -93,32 +93,55 @@ float snoise(vec3 v)
 
 varying float res_noise;
 varying vec3 newPos;
+
 uniform vec3 backgroundColor;
+uniform float islandRadius;
+uniform float beachWidth;
 
 void main() {
 
     vec2 uv = newPos.xz;
-    float disc_radius = 250.0;
-    float border_size = 50.0;
+    //float beachWidth = 50.0;
 
     // Calculate distance from point to plane origin
     float dist = sqrt(dot(uv, uv));
 
-    // Add noise to not make the island perfectly circular
+    // Add noise to point-origin dist to not make the island perfectly circular
     float freq = 0.006;
-    float amplitude = 60.0;
-    float noise = amplitude * snoise(freq * newPos);
-    dist += noise;
+    float amplitude = 20.0;
+    float radiusNoise = amplitude * snoise(freq * newPos);
+    dist += radiusNoise;
 
-    // Create 'illusion' of a disc by assigning positions outside islandRadius the
-    // same color as the background
+    // Create 'illusion' of a disc by 'fragment clipping': assigning 
+    // positions outside islandRadius the same color as the background
     
-    float t = smoothstep(disc_radius+border_size/20., disc_radius-border_size/20., dist);
+    float islandEdge = smoothstep(islandRadius + beachWidth / 10.0, islandRadius - beachWidth / 10.0, dist);
     //vec4 background_color = vec4(vec3(backgroundColor), 1.0);
-    vec4 island_color = vec4(0.6 * res_noise + .6, 0.0, 0.3, 1.0);
 
-    vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0);
+    vec4 island_color1 = vec4(0.4, 0.3, 0.15, 1.0);
+    vec4 island_color2 = vec4(79.0/255.0, 60.0/255.0, 31.0/255.0, 1.0);
+    float montainNoise = 10.0 * snoise(0.008 * newPos) + 5.0 * snoise(0.1 * newPos) + 1.0 * snoise(1.0 * newPos);
+    float color_step = smoothstep(0.2, 0.9, montainNoise);
+    vec4 island_color = mix(island_color1, island_color2, color_step);
 
-    gl_FragColor = mix(background_color, island_color, t);
+    vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
+
+    // Mountains to beach transition
+    float mountainBeachEdge = smoothstep(islandRadius, islandRadius - beachWidth, dist);
+    island_color = mix(vec4(249.0/255.0, 243.0/255.0, 232.0/255.0, 1.0), island_color, mountainBeachEdge);
+
+    // Beach
+    /*
+    if (mountainBeachEdge > normalize(islandRadius - beachWidth)) 
+    {
+      vec4 sand1 = vec4(249.0/255.0, 243.0/255.0, 232.0/255.0, 1.0);
+      vec4 sand2 = vec4(242./255., 232./255., 213./255., 1.0);
+      float sandNoise = 5.0 * snoise(1.3 * newPos);
+      color_step = smoothstep(0.2, 0.9, sandNoise);
+      island_color = mix(sand1, sand2, color_step);
+    }
+    */
+
+    gl_FragColor = mix(background_color, island_color, islandEdge);
 
 }
