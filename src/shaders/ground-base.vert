@@ -97,7 +97,9 @@ float snoise(vec3 v)
     uniform float beachWidth;
 
     varying float res_noise;
-    varying vec3 newPos;
+    varying vec3 vWorldPosition;
+    varying vec3 vNormal;
+    varying vec3 vViewPosition;
 
     void main() {
 
@@ -118,9 +120,9 @@ float snoise(vec3 v)
           amplitude *= noise_gain;
       }
 
-      newPos.x = position.x;
-      newPos.y = position.y + normal.y * res_noise * displacement;
-      newPos.z = position.z;
+      vWorldPosition.x = position.x;
+      vWorldPosition.y = position.y + normal.y * res_noise * displacement;
+      vWorldPosition.z = position.z;
 
       /* --- Distance in xz-plane from position to plane origin ----------------------------------------- */
       vec2 position_xz = position.xz;
@@ -129,13 +131,19 @@ float snoise(vec3 v)
       float mountainsDecayStart = beachWidth * 6.0;
 
       // Smoothstep mountains to decay as the distance from origin increases
-      newPos.y *= smoothstep(islandRadius, islandRadius - mountainsDecayStart, dist);
+      vWorldPosition.y *= smoothstep(islandRadius, islandRadius - mountainsDecayStart, dist);
 
       // Step final distance to border to make the beach flat
-      newPos.y *= 1.0 - step(islandRadius - beachWidth, dist);
+      vWorldPosition.y *= 1.0 - step(islandRadius - beachWidth, dist);
 
       // Displace only in positive y direction
-      newPos.y = abs(newPos.y);
+      vWorldPosition.y = abs(vWorldPosition.y);
 
-      gl_Position = projectionMatrix * modelViewMatrix * vec4(newPos, 1.0);
+      // Calculate view direction used in lighting
+      vec4 mvPosition = modelViewMatrix * vec4( vWorldPosition, 1.0 ); //Eye-coordinate position
+      vViewPosition = - mvPosition.xyz;
+
+      //vNormal = normalMatrix * normal; //normalMatrix is worldToObject
+
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(vWorldPosition, 1.0);
     }

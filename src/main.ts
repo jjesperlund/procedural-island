@@ -81,6 +81,7 @@ export class Main {
     render(): void {
         this.stats.update();
         this.camera.update();
+        this.scene.update();
         this.renderer.render(this.scene, this.camera)
         requestAnimationFrame(this.render.bind(this)); // Bind the main class instead of window object
     }

@@ -1,3 +1,7 @@
+// Enable extenstion to access dFdx(), dFdy()
+#extension GL_OES_standard_derivatives : enable
+
+
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -92,16 +96,39 @@ float snoise(vec3 v)
 
 
 varying float res_noise;
-varying vec3 newPos;
+varying vec3 vWorldPosition;
+varying vec3 vNormal;
+varying vec3 vViewPosition;
 
 uniform vec3 backgroundColor;
 uniform float islandRadius;
 uniform float beachWidth;
+uniform vec3 lightPos;
+
+struct PointLight {
+    vec3 position;
+    vec3 color;
+    float distance;
+    float decay;
+
+    int shadow;
+    float shadowBias;
+    float shadowRadius;
+    vec2 shadowMapSize;
+    float shadowCameraNear;
+    float shadowCameraFar;
+};
+
+uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
+
 
 void main() {
 
-    vec2 uv = newPos.xz;
-    //float beachWidth = 50.0;
+    // Create 'illusion' of a disc by 'fragment clipping': assigning 
+    // positions outside islandRadius the same color as the background
+    vec4 island_color;
+
+    vec2 uv = vWorldPosition.xz;
 
     // Calculate distance from point to plane origin
     float dist = sqrt(dot(uv, uv));
@@ -109,39 +136,45 @@ void main() {
     // Add noise to point-origin dist to not make the island perfectly circular
     float freq = 0.006;
     float amplitude = 20.0;
-    float radiusNoise = amplitude * snoise(freq * newPos);
+    float radiusNoise = amplitude * snoise(freq * vWorldPosition);
     dist += radiusNoise;
-
-    // Create 'illusion' of a disc by 'fragment clipping': assigning 
-    // positions outside islandRadius the same color as the background
     
     float islandEdge = smoothstep(islandRadius + beachWidth / 10.0, islandRadius - beachWidth / 10.0, dist);
     //vec4 background_color = vec4(vec3(backgroundColor), 1.0);
 
-    vec4 island_color1 = vec4(0.4, 0.3, 0.15, 1.0);
-    vec4 island_color2 = vec4(79.0/255.0, 60.0/255.0, 31.0/255.0, 1.0);
-    float montainNoise = 10.0 * snoise(0.008 * newPos) + 5.0 * snoise(0.1 * newPos) + 1.0 * snoise(1.0 * newPos);
+    // Mountains
+    vec4 mountain_color1 = vec4(0.4, 0.3, 0.15, 1.0);
+    vec4 montain_color2 = vec4(79.0/255.0, 60.0/255.0, 31.0/255.0, 1.0);
+    float montainNoise = 10.0 * snoise(0.008 * vWorldPosition) + 5.0 * snoise(0.1 * vWorldPosition) + 1.0 * snoise(1.0 * vWorldPosition);
     float color_step = smoothstep(0.2, 0.9, montainNoise);
-    vec4 island_color = mix(island_color1, island_color2, color_step);
+    island_color = mix(mountain_color1, montain_color2, color_step);
 
     vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
 
-    // Mountains to beach transition
-    float mountainBeachEdge = smoothstep(islandRadius, islandRadius - beachWidth, dist);
-    island_color = mix(vec4(249.0/255.0, 243.0/255.0, 232.0/255.0, 1.0), island_color, mountainBeachEdge);
-
     // Beach
-    /*
-    if (mountainBeachEdge > normalize(islandRadius - beachWidth)) 
-    {
-      vec4 sand1 = vec4(249.0/255.0, 243.0/255.0, 232.0/255.0, 1.0);
-      vec4 sand2 = vec4(242./255., 232./255., 213./255., 1.0);
-      float sandNoise = 5.0 * snoise(1.3 * newPos);
-      color_step = smoothstep(0.2, 0.9, sandNoise);
-      island_color = mix(sand1, sand2, color_step);
-    }
-    */
+    vec4 sand1 = vec4(249.0/255.0, 243.0/255.0, 232.0/255.0, 1.0);
+    vec4 sand2 = vec4(242./255., 232./255., 213./255., 1.0);
+    float sandNoise = 5.0 * snoise(1.3 * vWorldPosition);
+    color_step = smoothstep(0.2, 0.9, sandNoise);
+    vec4 beach_color = mix(sand1, sand2, color_step);
 
-    gl_FragColor = mix(background_color, island_color, islandEdge);
+    // Mountains to beach transition
+    float mountainBeachEdge = smoothstep(islandRadius - beachWidth/ 2.5, islandRadius - beachWidth / 1.8, dist);
+    island_color = mix(beach_color, island_color, mountainBeachEdge);
+
+    // Diffuse light reflection
+    vec3 mvPosition = -vViewPosition; //Eye coordinate space
+
+    // Calculate new normal after displacement
+    vec3 newNormal = normalize( cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ) );
+
+    // Calculate diffuse lighting
+    vec4 lightColor = vec4(0.1, 0.1, 0.1, 1.0);
+    for(int l = 0; l < NUM_POINT_LIGHTS; l++) {
+        vec3 lightDirection = normalize(pointLights[l].position -  mvPosition);
+        lightColor.rgb += clamp(dot(lightDirection, newNormal), 0.0, 1.0) * pointLights[l].color;
+    }
+
+    gl_FragColor = mix(background_color, island_color, islandEdge) * lightColor;
 
 }
