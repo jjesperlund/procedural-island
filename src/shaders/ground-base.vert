@@ -111,7 +111,7 @@ float snoise(vec3 v)
       float noise_gain = 0.5;
 
       // Initial values
-      float amplitude = 0.6;
+      float amplitude = 0.5;
       float frequency = 0.7;
   
       // Loop octaves and calculate summed simplex noise

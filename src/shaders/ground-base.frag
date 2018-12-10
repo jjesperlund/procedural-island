@@ -122,9 +122,8 @@ struct PointLight {
 
 uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-vec4 computeLighting(vec3 vViewPosition) 
+vec4 computeLighting(vec3 vViewPosition, vec3 newNormal) 
 {
-    vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
     float Kd;
     float Ka = 0.8;
 
@@ -147,12 +146,32 @@ vec4 computeLighting(vec3 vViewPosition)
     return vec4(ambientLighting + diffuseLighting, 1.0);
 }
 
+vec4 addGreens(vec3 vWorldPosition, vec4 island_color, vec3 vNormal, vec3 newNormal)
+{
+    float greensNoise = 1.5 * snoise(70. * vWorldPosition);// + 10.0 * snoise(30. * vWorldPosition);
+    float greens_color_step = smoothstep(0.4, 0.6, greensNoise);
+    vec4 greens1 = vec4(11.0/255.0, 56.0/255.0, 11.0/255.0, 1.0);
+    vec4 greens2 = vec4(15.0/255.0, 63.0/255.0, 15.0/255.0, 1.0);
+    vec4 greens_color = mix(greens1, greens2, greens_color_step);
+
+    // Calculate elevation angle (vNormal = vec3(0, 1, 0))
+    // Big elevation angle means no greens grow there
+    float amountGreens = 0.4;
+    float elevationAngle = abs(dot(newNormal, vNormal));
+    float greens_step = step(1.0 - amountGreens, elevationAngle);
+
+    return mix(island_color, greens_color, greens_step);
+}
+
 
 void main() {
 
     // Create 'illusion' of a disc by 'fragment clipping': assigning 
     // positions outside islandRadius the same color as the background
     vec4 island_color;
+
+    // Calculate new normal for each facet after displacement
+    vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
     
     float islandEdge = smoothstep(islandRadius + beachWidth / 5.0, islandRadius - beachWidth / 5.0, distanceToOrigin);
     vec4 background_color = vec4(vec3(backgroundColor), 1.0);
@@ -160,9 +179,13 @@ void main() {
     // Mountains
     vec4 mountain_color1 = vec4(91.0/255.0, 89.0/255.0, 84.0/255.0, 1.0);
     vec4 montain_color2 = vec4(99.0/255.0, 97.0/255.0, 92.0/255.0, 1.0);
-    float montainNoise = 20.0 * snoise(20. * vWorldPosition)+ 10.0 * snoise(30. * vWorldPosition);
-    float color_step = smoothstep(0.2, 0.9, montainNoise);
+    float montainNoise = 20.0 * snoise(70. * vWorldPosition)+ 10.0 * snoise(30. * vWorldPosition);
+    float color_step = smoothstep(0.1, 0.9, montainNoise);
     island_color = mix(mountain_color1, montain_color2, color_step);
+
+    // Greens
+
+    island_color = addGreens(vWorldPosition, island_color, vNormal, newNormal);
 
     //vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
 
@@ -178,7 +201,7 @@ void main() {
     island_color = mix(beach_color, island_color, mountainBeachEdge);
 
 
-    vec4 lighting = computeLighting(vViewPosition);
+    vec4 lighting = computeLighting(vViewPosition, newNormal);
 
     if (distanceToOrigin > islandRadius) lighting = vec4(1.);
 
