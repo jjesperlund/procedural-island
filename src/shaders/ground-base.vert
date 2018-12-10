@@ -97,21 +97,22 @@ float snoise(vec3 v)
     uniform float beachWidth;
 
     varying float res_noise;
+    varying float distanceToOrigin;
     varying vec3 vWorldPosition;
-    varying vec3 vNormal;
     varying vec3 vViewPosition;
+    varying vec3 vNormal;
 
     void main() {
 
     /* --- Noise parameters ----------------------------------------- */
       // Properties
-      const int octaves = 4;
+      const int octaves = 8;
       float freq_multiplier = 2.0;
       float noise_gain = 0.5;
 
       // Initial values
-      float amplitude = 1.0;
-      float frequency = 0.005;
+      float amplitude = 0.6;
+      float frequency = 0.7;
   
       // Loop octaves and calculate summed simplex noise
       for (int i = 0; i < octaves; i++) {
@@ -119,31 +120,37 @@ float snoise(vec3 v)
           frequency *= freq_multiplier;
           amplitude *= noise_gain;
       }
+      res_noise += 0.5;
 
       vWorldPosition.x = position.x;
-      vWorldPosition.y = position.y + normal.y * res_noise * displacement;
+      vWorldPosition.y = position.y + normal.y * res_noise;
       vWorldPosition.z = position.z;
 
       /* --- Distance in xz-plane from position to plane origin ----------------------------------------- */
       vec2 position_xz = position.xz;
-      float dist = sqrt(dot(position_xz, position_xz));
+      distanceToOrigin = sqrt(dot(position_xz, position_xz));
+      // Add noise to island radius to not make the island perfectly circular
+      float freq = 0.5;
+      amplitude = 0.3;
+      float radiusNoise = amplitude * snoise(freq * vWorldPosition);
+      distanceToOrigin += radiusNoise;
 
       float mountainsDecayStart = beachWidth * 6.0;
 
       // Smoothstep mountains to decay as the distance from origin increases
-      vWorldPosition.y *= smoothstep(islandRadius, islandRadius - mountainsDecayStart, dist);
+      vWorldPosition.y *= smoothstep(islandRadius - mountainsDecayStart/ 15.0, islandRadius - mountainsDecayStart, distanceToOrigin);
 
-      // Step final distance to border to make the beach flat
-      vWorldPosition.y *= 1.0 - step(islandRadius - beachWidth, dist);
 
       // Displace only in positive y direction
-      vWorldPosition.y = abs(vWorldPosition.y);
+      //vWorldPosition.y = abs(vWorldPosition.y);
 
-      // Calculate view direction used in lighting
-      vec4 mvPosition = modelViewMatrix * vec4( vWorldPosition, 1.0 ); //Eye-coordinate position
-      vViewPosition = - mvPosition.xyz;
 
-      //vNormal = normalMatrix * normal; //normalMatrix is worldToObject
+      //Transform vertex into eye space
+      vViewPosition = vec3(modelViewMatrix * vec4( vWorldPosition, 1.0 )); 
+      //Transform vertex normal into eye space
+      vNormal = vec3(modelViewMatrix * vec4(normal, 0.0));
+
+      //vNormal = normalMatrix * vNormal; //normalMatrix is worldToObject
 
       gl_Position = projectionMatrix * modelViewMatrix * vec4(vWorldPosition, 1.0);
     }

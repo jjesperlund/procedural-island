@@ -22,21 +22,19 @@ export class Scene extends THREE.Scene {
     constructor() {
         super();
         // add axis to the scene
-        let axis = new THREE.AxesHelper(800);
+        let axis = new THREE.AxesHelper(15);
         this.add(axis);
-
-        //this.add( new THREE.GridHelper( 800, 800 ) );
 
         this.loadShader('/src/shaders/ground-base.vert', (vsErr, vsText) => { 
             this.loadShader('/src/shaders/ground-base.frag', (frErr, frText) => { 
 
                 let uniforms = {
-                    scale: { type: "f", value: 10.0 },
-                    displacement: { type: "f", value: 70.0},
+                    scale: { type: "f", value: 0.1 },
+                    displacement: { type: "f", value: 1.0},
                     time: { type: "f", value: 10.0 },
                     backgroundColor: { type: "v3", value: this.backgroundColor },
-                    islandRadius: { type: "f", value: 250.0 },
-                    beachWidth: { type: "f", value: 20.0 },
+                    islandRadius: { type: "f", value: 2.5 },
+                    beachWidth: { type: "f", value: 0.2 },
                     lightPos: { type: "v3", value: this.light.position }
                 };
             
@@ -49,10 +47,10 @@ export class Scene extends THREE.Scene {
                     ]),
                     vertexShader : vsText,
                     fragmentShader : frText,
-                    lights: true
+                    lights: true,
                 });
                     
-                const g = new THREE.BoxBufferGeometry(600, 1, 600, 300, 10, 300);
+                const g = new THREE.BoxBufferGeometry(6, 0.05, 6, 200, 10, 200);
                 // let g = new THREE.PlaneGeometry(500, 500, 200, 200);
                 // const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(1.0, 0.5, 0.5) });
                 let islandMesh = new THREE.Mesh(g, m);
@@ -71,8 +69,8 @@ export class Scene extends THREE.Scene {
         */
 
         // add lights
-        this.light = new THREE.PointLight(0xffffff, 2, 0, 2);
-        this.light.position.set(550, 300, 10)
+        this.light = new THREE.PointLight(0xffffff, 8.0, 0, 2);
+        this.light.position.set(5, 5, 1);
         /*
         light.castShadow = true; 
         light.shadow.mapSize.width = 1024;
@@ -86,7 +84,7 @@ export class Scene extends THREE.Scene {
         */
         this.add(this.light);
 
-        var helper = new THREE.PointLightHelper( this.light, 30 );
+        var helper = new THREE.PointLightHelper( this.light, 1 );
         this.add( helper );
         
 

@@ -35,7 +35,7 @@ export class Main {
 
         const controls = new OrbitControls(this.camera, this.renderer.domElement);
         controls.enabled = true;
-        controls.maxDistance = 1500;
+        controls.maxDistance = 15;
         controls.minDistance = 0;
 
         // Initial size update set to canvas container
@@ -80,7 +80,7 @@ export class Main {
 
     render(): void {
         this.stats.update();
-        this.camera.update();
+        //this.camera.update();
         this.scene.update();
         this.renderer.render(this.scene, this.camera)
         requestAnimationFrame(this.render.bind(this)); // Bind the main class instead of window object
