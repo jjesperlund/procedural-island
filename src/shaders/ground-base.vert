@@ -95,14 +95,18 @@ float snoise(vec3 v)
     uniform float time;
     uniform float islandRadius;
     uniform float beachWidth;
+    uniform vec3 cameraPos;
 
     varying float res_noise;
     varying float distanceToOrigin;
+    varying float distanceToCamera;
     varying vec3 vWorldPosition;
     varying vec3 vViewPosition;
     varying vec3 vNormal;
 
     void main() {
+
+    distanceToCamera = length(cameraPos - vWorldPosition); 
 
     /* --- Noise parameters ----------------------------------------- */
       // Properties
@@ -112,7 +116,7 @@ float snoise(vec3 v)
 
       // Initial values
       float amplitude = 0.5;
-      float frequency = 0.7;
+      float frequency = (15.0 - distanceToCamera) / 20.0 + 0.6;
   
       // Loop octaves and calculate summed simplex noise
       for (int i = 0; i < octaves; i++) {

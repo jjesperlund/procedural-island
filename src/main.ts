@@ -14,6 +14,7 @@ export class Main {
     private renderer: Renderer;
     private container: any;
     private stats: any;
+    private controls: any;
     constructor(container) {
 
         // @ts-ignore: Unreachable code error
@@ -25,18 +26,18 @@ export class Main {
 
         // create the renderer
         this.renderer = new Renderer(this.container);
-        
-        // create the scene
-        this.scene = new Scene();
 
         // create the camera
         const aspectRatio = this.renderer.domElement.width / this.renderer.domElement.height;
         this.camera = new Camera(aspectRatio);
 
-        const controls = new OrbitControls(this.camera, this.renderer.domElement);
-        controls.enabled = true;
-        controls.maxDistance = 15;
-        controls.minDistance = 0;
+        this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+        this.controls.enabled = true;
+        this.controls.maxDistance = 15;
+        this.controls.minDistance = 0;
+
+        // create the scene
+        this.scene = new Scene(this.camera, this.controls);
 
         // Initial size update set to canvas container
         this.updateSize();

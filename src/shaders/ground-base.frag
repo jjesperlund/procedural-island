@@ -97,6 +97,7 @@ float snoise(vec3 v)
 
 varying float res_noise;
 varying float distanceToOrigin;
+varying float distanceToCamera;
 varying vec3 vWorldPosition;
 varying vec3 vNormal;
 varying vec3 vViewPosition;
@@ -105,6 +106,8 @@ uniform vec3 backgroundColor;
 uniform float islandRadius;
 uniform float beachWidth;
 uniform vec3 lightPos;
+uniform vec3 cameraPos;
+
 
 struct PointLight {
     vec3 position;
@@ -156,9 +159,8 @@ vec4 addGreens(vec3 vWorldPosition, vec4 island_color, vec3 vNormal, vec3 newNor
 
     // Calculate elevation angle (vNormal = vec3(0, 1, 0))
     // Big elevation angle means no greens grow there
-    float amountGreens = 0.4;
     float elevationAngle = abs(dot(newNormal, vNormal));
-    float greens_step = step(1.0 - amountGreens, elevationAngle);
+    float greens_step = smoothstep(0.7, 0.8, elevationAngle);
 
     return mix(island_color, greens_color, greens_step);
 }
