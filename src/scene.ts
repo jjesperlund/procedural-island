@@ -114,7 +114,6 @@ export class Scene extends THREE.Scene {
   
         // Update camera position and send to shaders when view changes
         this.controls.addEventListener( 'change', () => {
-            console.log(this.cameraPosition.distanceTo(new THREE.Vector3(0, 0, 0)));
             this.LODNode.update(camera);
             /*
             if (this.islandMesh.material) {

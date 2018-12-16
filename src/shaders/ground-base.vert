@@ -110,7 +110,7 @@ float snoise(vec3 v)
 
     /* --- Noise parameters ----------------------------------------- */
       // Properties
-      const int octaves = 6;
+      const int octaves = 4;
       float freq_multiplier = 2.0;
       float noise_gain = 0.5;
 
