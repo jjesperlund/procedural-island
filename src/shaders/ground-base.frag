@@ -202,11 +202,7 @@ void main() {
     float mountainBeachEdge = smoothstep(islandRadius - beachWidth/ 2.5, islandRadius - beachWidth, distanceToOrigin);
     island_color = mix(beach_color, island_color, mountainBeachEdge);
 
-
     vec4 lighting = computeLighting(vViewPosition, newNormal);
-
-    if (distanceToOrigin > islandRadius) lighting = vec4(1.);
-
 
     gl_FragColor = mix(background_color, island_color, islandEdge) * lighting;
 

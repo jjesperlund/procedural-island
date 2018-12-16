@@ -7,6 +7,7 @@ export class Scene extends THREE.Scene {
     private light: THREE.PointLight;
     private cameraPosition: THREE.Vector3;
     private islandMesh: THREE.Mesh;
+    private LODNode: THREE.LOD = new THREE.LOD();
     loadShader( path, callback ) {
         var request = new XMLHttpRequest();
         request.open('GET', path, true);
@@ -21,13 +22,14 @@ export class Scene extends THREE.Scene {
     };
     constructor(camera, controls) {
         super();
+
+        const numberOfLODS = 5;
         this.cameraPosition = camera.position;
         this.controls = controls;
 
         // add axis to the scene
         let axis = new THREE.AxesHelper(15);
         this.add(axis);
-
 
         // add lights
         this.light = new THREE.PointLight(0xffffff, 8.0, 0, 2);
@@ -91,23 +93,35 @@ export class Scene extends THREE.Scene {
 
                 m.needsUpdate = true;
                     
+                for (var i = 0; i < numberOfLODS; i++) {
+                    const g = new THREE.BoxBufferGeometry(6, 0.05, 6, 300 - i * 55, 1, 300 - i * 55);
+                    // let g = new THREE.PlaneGeometry(500, 500, 200, 200);
+                    // const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(1.0, 0.5, 0.5) });
+                    var islandMesh = new THREE.Mesh(g, m);
+                    this.LODNode.addLevel(islandMesh, i * 2 + 3);
+                }
+                this.add(this.LODNode);
+                /*
                 const g = new THREE.BoxBufferGeometry(6, 0.05, 6, 200, 1, 200);
                 // let g = new THREE.PlaneGeometry(500, 500, 200, 200);
                 // const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(1.0, 0.5, 0.5) });
                 this.islandMesh = new THREE.Mesh(g, m);
-                this.islandMesh.castShadow = true;
-                this.islandMesh.receiveShadow = true;
                 this.add(this.islandMesh);
+                */
             });
             
         });
   
         // Update camera position and send to shaders when view changes
         this.controls.addEventListener( 'change', () => {
+            console.log(this.cameraPosition.distanceTo(new THREE.Vector3(0, 0, 0)));
+            this.LODNode.update(camera);
+            /*
             if (this.islandMesh.material) {
                 // @ts-ignore
                 this.islandMesh.material.uniforms.cameraPos.value = this.cameraPosition;
             }
+            */
         });
         
 

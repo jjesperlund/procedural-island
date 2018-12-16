@@ -110,13 +110,14 @@ float snoise(vec3 v)
 
     /* --- Noise parameters ----------------------------------------- */
       // Properties
-      const int octaves = 8;
+      const int octaves = 6;
       float freq_multiplier = 2.0;
       float noise_gain = 0.5;
 
       // Initial values
       float amplitude = 0.5;
-      float frequency = (15.0 - distanceToCamera) / 20.0 + 0.6;
+      //float frequency = (15.0 - distanceToCamera) / 20.0 + 0.6;
+      float frequency = 0.5;
   
       // Loop octaves and calculate summed simplex noise
       for (int i = 0; i < octaves; i++) {
@@ -134,8 +135,8 @@ float snoise(vec3 v)
       vec2 position_xz = position.xz;
       distanceToOrigin = sqrt(dot(position_xz, position_xz));
       // Add noise to island radius to not make the island perfectly circular
-      float freq = 0.5;
-      amplitude = 0.3;
+      float freq = 0.6;
+      amplitude = 0.2;
       float radiusNoise = amplitude * snoise(freq * vWorldPosition);
       distanceToOrigin += radiusNoise;
 
@@ -144,10 +145,8 @@ float snoise(vec3 v)
       // Smoothstep mountains to decay as the distance from origin increases
       vWorldPosition.y *= smoothstep(islandRadius - mountainsDecayStart/ 15.0, islandRadius - mountainsDecayStart, distanceToOrigin);
 
-
       // Displace only in positive y direction
       //vWorldPosition.y = abs(vWorldPosition.y);
-
 
       //Transform vertex into eye space
       vViewPosition = vec3(modelViewMatrix * vec4( vWorldPosition, 1.0 )); 
