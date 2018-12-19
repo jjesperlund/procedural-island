@@ -103,8 +103,14 @@ float snoise(vec3 v)
     varying vec3 vWorldPosition;
     varying vec3 vViewPosition;
     varying vec3 vNormal;
+    
 
-    void main() {
+  void main() {
+
+    vNormal = normal;
+
+    // Only displace in positive y direction
+    if (vNormal.y < 0.0) vNormal.y *= -1.0;
 
     distanceToCamera = length(cameraPos - vWorldPosition); 
 
@@ -115,7 +121,7 @@ float snoise(vec3 v)
       float noise_gain = 0.5;
 
       // Initial values
-      float amplitude = 0.5;
+      float amplitude = 0.35;
       //float frequency = (15.0 - distanceToCamera) / 20.0 + 0.6;
       float frequency = 0.5;
   
@@ -128,32 +134,41 @@ float snoise(vec3 v)
       res_noise += 0.5;
 
       vWorldPosition.x = position.x;
-      vWorldPosition.y = position.y + normal.y * res_noise;
-      vWorldPosition.z = position.z;
+      vWorldPosition.y = position.y + vNormal.y * res_noise;
+      vWorldPosition.z = position.z;      
 
       /* --- Distance in xz-plane from position to plane origin ----------------------------------------- */
       vec2 position_xz = position.xz;
       distanceToOrigin = sqrt(dot(position_xz, position_xz));
       // Add noise to island radius to not make the island perfectly circular
-      float freq = 0.6;
-      amplitude = 0.2;
+      float freq = 0.4;
+      amplitude = 0.4;
       float radiusNoise = amplitude * snoise(freq * vWorldPosition);
       distanceToOrigin += radiusNoise;
 
-      float mountainsDecayStart = beachWidth * 6.0;
+      float mountainsDecayStart = beachWidth * 7.0;
+      float vegetationEnd= islandRadius - 0.7;
+      float vegetationStart = islandRadius - beachWidth * 2.2;
+
+      // Trees      
+      float ttt_noise = 0.8 * snoise(35.5 * (position + 0.5));
+      ttt_noise *= 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
+      vWorldPosition.y += ttt_noise;
 
       // Smoothstep mountains to decay as the distance from origin increases
       vWorldPosition.y *= smoothstep(islandRadius - mountainsDecayStart/ 15.0, islandRadius - mountainsDecayStart, distanceToOrigin);
 
-      // Displace only in positive y direction
-      //vWorldPosition.y = abs(vWorldPosition.y);
+      // Step vegetation to beach transition
+      vWorldPosition.y *= step(0.2, islandRadius - distanceToOrigin);
 
       //Transform vertex into eye space
       vViewPosition = vec3(modelViewMatrix * vec4( vWorldPosition, 1.0 )); 
       //Transform vertex normal into eye space
-      vNormal = vec3(modelViewMatrix * vec4(normal, 0.0));
+      vNormal = vec3(modelViewMatrix * vec4(vNormal, 0.0));
+
 
       //vNormal = normalMatrix * vNormal; //normalMatrix is worldToObject
+
 
       gl_Position = projectionMatrix * modelViewMatrix * vec4(vWorldPosition, 1.0);
     }

@@ -158,9 +158,9 @@ vec4 addGreens(vec3 vWorldPosition, vec4 island_color, vec3 vNormal, vec3 newNor
     vec4 greens_color = mix(greens1, greens2, greens_color_step);
 
     // Calculate elevation angle (vNormal = vec3(0, 1, 0))
-    // Big elevation angle means no greens grow there
+    // Big elevation angle means no vegetation grow there
     float elevationAngle = abs(dot(newNormal, vNormal));
-    float greens_step = smoothstep(0.7, 0.8, elevationAngle);
+    float greens_step = smoothstep(0.6, 0.8, elevationAngle);
 
     return mix(island_color, greens_color, greens_step);
 }
@@ -180,14 +180,13 @@ void main() {
 
     // Mountains
     vec4 mountain_color1 = vec4(91.0/255.0, 89.0/255.0, 84.0/255.0, 1.0);
-    vec4 montain_color2 = vec4(99.0/255.0, 97.0/255.0, 92.0/255.0, 1.0);
-    float montainNoise = 20.0 * snoise(70. * vWorldPosition)+ 10.0 * snoise(30. * vWorldPosition);
-    float color_step = smoothstep(0.1, 0.9, montainNoise);
-    island_color = mix(mountain_color1, montain_color2, color_step);
+    vec4 mountain_color2 = vec4(99.0/255.0, 97.0/255.0, 92.0/255.0, 1.0);
+    float mountainNoise = 20.0 * snoise(70. * vWorldPosition)+ 10.0 * snoise(30. * vWorldPosition);
+    float color_step = smoothstep(0.1, 0.9, mountainNoise);
+    island_color = mix(mountain_color1, mountain_color2, color_step);
 
     // Greens
-
-    island_color = addGreens(vWorldPosition, island_color, vNormal, newNormal);
+    //island_color = addGreens(vWorldPosition, island_color, vNormal, newNormal);
 
     //vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
 
