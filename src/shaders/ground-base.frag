@@ -160,7 +160,7 @@ vec4 addGreens(vec3 vWorldPosition, vec4 island_color, vec3 vNormal, vec3 newNor
     // Calculate elevation angle (vNormal = vec3(0, 1, 0))
     // Big elevation angle means no vegetation grow there
     float elevationAngle = abs(dot(newNormal, vNormal));
-    float greens_step = smoothstep(0.6, 0.8, elevationAngle);
+    float greens_step = smoothstep(0.7, 0.9, elevationAngle);
 
     return mix(island_color, greens_color, greens_step);
 }
@@ -187,13 +187,21 @@ void main() {
 
     // Greens
     //island_color = addGreens(vWorldPosition, island_color, vNormal, newNormal);
+    float vegetationEnd= islandRadius - 0.7;
+    float vegetationStart = islandRadius - beachWidth * 2.2;
+
+    // Trees      
+    //float ttt_noise = 0.8 * snoise(35.5 * (position + 0.5));
+    float ttt_noise = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
+    vec4 c1 = vec4(0.0, 0.3, 0.1, 1.0) * ttt_noise; 
+    island_color = mix(island_color, c1, ttt_noise);
 
     //vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
 
     // Beach
     vec4 sand1 = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0);
     vec4 sand2 = vec4(182./255., 172./255., 153./255., 1.0);
-    float sandNoise = 5.0 * snoise(30. * vWorldPosition);
+    float sandNoise = 5.0 * snoise(40. * vWorldPosition);
     color_step = smoothstep(0.2, 0.9, sandNoise);
     vec4 beach_color = mix(sand1, sand2, color_step);
 
