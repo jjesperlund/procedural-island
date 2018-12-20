@@ -193,7 +193,7 @@ void main() {
     // Trees      
     //float ttt_noise = 0.8 * snoise(35.5 * (position + 0.5));
     float ttt_noise = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
-    vec4 c1 = vec4(0.0, 0.3, 0.1, 1.0) * ttt_noise; 
+    vec4 c1 = vec4(0.0, 0.3 * ttt_noise, 0.1, 1.0); 
     island_color = mix(island_color, c1, ttt_noise);
 
     //vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
@@ -210,6 +210,8 @@ void main() {
     island_color = mix(beach_color, island_color, mountainBeachEdge);
 
     vec4 lighting = computeLighting(vViewPosition, newNormal);
+
+    if (distanceToOrigin > islandRadius) lighting = vec4(1.0);
 
     gl_FragColor = mix(background_color, island_color, islandEdge) * lighting;
 

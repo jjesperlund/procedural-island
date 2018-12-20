@@ -7,7 +7,9 @@ export class Scene extends THREE.Scene {
     private light: THREE.PointLight;
     private cameraPosition: THREE.Vector3;
     private islandMesh: THREE.Mesh;
+    private waterMesh: THREE.Mesh;
     private LODNode: THREE.LOD = new THREE.LOD();
+    private clock: THREE.Clock = new THREE.Clock();
     loadShader( path, callback ) {
         var request = new XMLHttpRequest();
         request.open('GET', path, true);
@@ -63,6 +65,29 @@ export class Scene extends THREE.Scene {
         //this.add( ambient );
 
         this.background = new THREE.Color( this.backgroundColor);
+
+        this.loadShader('/src/shaders/water.vert', (vsErr, vsText) => { 
+            this.loadShader('/src/shaders/water.frag', (frErr, frText) => { 
+
+                // Assign shader to material
+                let m = new THREE.ShaderMaterial({
+                    uniforms: {
+                        time: { type: "f", value: 10.0 }
+                    },
+                    vertexShader : vsText,
+                    fragmentShader : frText,
+                });
+
+                m.needsUpdate = true;
+
+                let g = new THREE.BoxBufferGeometry(6, 0.2, 6, 100, 1, 100);
+
+                this.waterMesh = new THREE.Mesh(g, m);
+                this.waterMesh.position.y = 0.001;
+                this.add(this.waterMesh);                
+
+            });
+        });
 
 
         this.loadShader('/src/shaders/ground-base.vert', (vsErr, vsText) => { 
@@ -128,5 +153,9 @@ export class Scene extends THREE.Scene {
 
     update() {
         //this.light.rotateY(Math.PI / 100);
+        if (this.waterMesh) {
+            // @ts-ignore
+            this.waterMesh.material.uniforms.time.value = this.clock.getElapsedTime();
+        }
     }
 }
