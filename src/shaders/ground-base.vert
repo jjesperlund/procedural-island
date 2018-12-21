@@ -143,7 +143,7 @@ float snoise(vec3 v)
       // Add noise to island radius to not make the island perfectly circular
       float freq = 0.4;
       amplitude = 0.4;
-      float radiusNoise = amplitude * snoise(freq * vWorldPosition);
+      float radiusNoise = amplitude * snoise(freq * vec3(position_xz, 1.0));
       distanceToOrigin += radiusNoise;
 
       float mountainsDecayStart = beachWidth * 7.0;

@@ -72,7 +72,9 @@ export class Scene extends THREE.Scene {
                 // Assign shader to material
                 let m = new THREE.ShaderMaterial({
                     uniforms: {
-                        time: { type: "f", value: 10.0 }
+                        time: { type: "f", value: 10.0 },
+                        islandRadius: { type: "f", value: 2.5 },
+                        beachWidth: { type: "f", value: 0.2 }
                     },
                     vertexShader : vsText,
                     fragmentShader : frText,
@@ -83,7 +85,7 @@ export class Scene extends THREE.Scene {
                 let g = new THREE.BoxBufferGeometry(6, 0.2, 6, 100, 1, 100);
 
                 this.waterMesh = new THREE.Mesh(g, m);
-                this.waterMesh.position.y = 0.001;
+                //this.waterMesh.position.y = 0.01;
                 this.add(this.waterMesh);                
 
             });
