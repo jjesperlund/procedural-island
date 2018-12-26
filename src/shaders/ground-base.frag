@@ -176,7 +176,7 @@ void main() {
     vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
     
     float islandEdge = smoothstep(islandRadius + beachWidth / 5.0, islandRadius - beachWidth / 5.0, distanceToOrigin);
-    vec4 background_color = vec4(vec3(backgroundColor), 1.0);
+    //vec4 background_color = vec4(vec3(backgroundColor), 1.0);
 
     // Mountains
     vec4 mountain_color1 = vec4(91.0/255.0, 89.0/255.0, 84.0/255.0, 1.0);
@@ -196,7 +196,7 @@ void main() {
     vec4 c1 = vec4(0.0, 0.3 * ttt_noise, 0.1, 1.0); 
     island_color = mix(island_color, c1, ttt_noise);
 
-    //vec4 background_color = vec4(0.0, 0.7, 0.2, 1.0); //temp
+    vec4 background_color = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0); //temp
 
     // Beach
     vec4 sand1 = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0);
@@ -210,8 +210,6 @@ void main() {
     island_color = mix(beach_color, island_color, mountainBeachEdge);
 
     vec4 lighting = computeLighting(vViewPosition, newNormal);
-
-    if (distanceToOrigin > islandRadius) lighting = vec4(1.0);
 
     gl_FragColor = mix(background_color, island_color, islandEdge) * lighting;
 

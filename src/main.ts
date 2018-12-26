@@ -6,7 +6,6 @@ import * as OrbitControls from 'orbit-controls-es6';
 import { Renderer } from './renderer';
 import { Camera } from './camera';
 import { Scene } from './scene';
-import { Poly } from './poly';
 
 export class Main {
     private scene: Scene;
@@ -48,29 +47,6 @@ export class Main {
         
         this.render()
 
-        // POLY REST API
-        /*
-        let randomAssets = ['7Rr7j8S0q6C','fsUd856ZJZM']
-        let poly = new Poly(randomAssets[Math.floor(Math.random()*randomAssets.length)]);
-        this.scene.add( poly );
-        */
-
-        // Hide loading text
-        this.container.querySelector('#loading').style.display = 'none';
-
-        // For testing
-        document.addEventListener("keydown", (event) => {
-            if (event.key === "ArrowLeft") {
-                this.camera.rotation.y += 0.5
-            }
-            else if (event.key === "ArrowRight") {
-                this.camera.rotation.y -= 0.5
-            } else if (event.key === "ArrowUp") {
-                this.camera.rotation.x += 0.5
-            } else if (event.key === "ArrowDown") {
-                this.camera.rotation.x -= 0.5
-            }
-        });
     
     }
 

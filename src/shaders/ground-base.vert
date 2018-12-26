@@ -163,14 +163,13 @@ float snoise(vec3 v)
 
 
       // Beach elevation decay to ocean
-      vWorldPosition.y += 0.03; 
-      vWorldPosition.y *= smoothstep(islandRadius, islandRadius - beachWidth, distanceToOrigin);
+      vWorldPosition.y += 0.07; 
+      vWorldPosition.y *= smoothstep(islandRadius + 0.05, islandRadius - beachWidth, distanceToOrigin);
 
       //Transform vertex into eye space
       vViewPosition = vec3(modelViewMatrix * vec4( vWorldPosition, 1.0 )); 
       //Transform vertex normal into eye space
       vNormal = vec3(modelViewMatrix * vec4(vNormal, 0.0));
-
 
       //vNormal = normalMatrix * vNormal; //normalMatrix is worldToObject
 

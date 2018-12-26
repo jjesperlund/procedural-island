@@ -111,10 +111,11 @@ varying vec3 vPosition;
 void main() {
 
     vPosition = position;
+    //float trans_speed = time * 0.01;
+    vec2 displacementPosition = vec2(vPosition.x, vPosition.z);
 
     //noise = abs(snoise(time * pos * 0.5));
-    noise = 0.5 * abs(srnoise(4.0 * vPosition.xz, 0.2 * time));
-    //noise += 0.5 * abs(srnoise(15.0 * pos.xz, 0.1 * time));
+    noise = 0.5 * abs(srnoise(5.0 * displacementPosition, 0.2 * time));
 
     vPosition.y = vPosition.y * noise;
 

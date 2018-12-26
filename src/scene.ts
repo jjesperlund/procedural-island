@@ -82,10 +82,10 @@ export class Scene extends THREE.Scene {
 
                 m.needsUpdate = true;
 
-                let g = new THREE.BoxBufferGeometry(6, 0.2, 6, 100, 1, 100);
+                let g = new THREE.BoxBufferGeometry(10, 0.2, 10, 100, 1, 100);
 
                 this.waterMesh = new THREE.Mesh(g, m);
-                //this.waterMesh.position.y = 0.01;
+                //this.waterMesh.position.y = -0.05;
                 this.add(this.waterMesh);                
 
             });

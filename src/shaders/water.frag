@@ -91,7 +91,7 @@ float snoise(vec3 v)
   }
 
 uniform float islandRadius;
-uniform float beachRadius;
+uniform float beachWidth;
 
 varying float noise;
 varying vec3 vPosition;
@@ -107,15 +107,20 @@ void main() {
   float radiusNoise = amplitude * snoise(freq * vec3(position_xz, 1.0));
   distanceToOrigin += radiusNoise;
 
-  vec4 waterColor = vec4(0.0, 0.0, 1.0 * noise + 0.5, 1.0);
-  vec4 waterFoam = vec4(1.0, 1.0, 1.0, 1.0);
+  vec4 waterColor = vec4(0.0, 0.15 * noise, 0.3 * noise + 0.6, 1.0);
+  vec4 shallowWaterColor = vec4(0.3 * noise + 0.3, 0.3 * noise + 0.5, 0.3 * noise + 1.0, 1.0);
+  vec4 waterFoam = vec4(noise + 0.7, noise + 0.7, noise + 0.7, 1.0);
 
-  if (distanceToOrigin < islandRadius) {
-    float distanceToIslandEdge = islandRadius - distanceToOrigin;
-    float waterToFoam = smoothstep(0.1, 0.2, distanceToIslandEdge);
-    gl_FragColor = mix(waterColor, waterFoam, waterToFoam);
-    //gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-  }
-  else
-    gl_FragColor = vec4(0.0, 0.0, 1.0 * noise + 0.5, 1.0);
+  // Deep water to shallow water transition
+  float shallowBegin = islandRadius + beachWidth * 5.0;
+  float deepToShallow = smoothstep(shallowBegin, islandRadius, distanceToOrigin);
+  waterColor = mix(waterColor, shallowWaterColor, deepToShallow);
+
+  // Water to foam transition
+  //float distanceToIslandEdge = abs(islandRadius - distanceToOrigin);
+  float waterToFoam = smoothstep(islandRadius + 0.07, islandRadius, distanceToOrigin);
+  waterColor = mix(waterColor, waterFoam, waterToFoam);
+  
+  //else
+    gl_FragColor = waterColor;
 }
