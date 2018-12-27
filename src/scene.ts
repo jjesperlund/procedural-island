@@ -2,6 +2,7 @@
 import * as THREE from 'three'
 import { Island } from './island';
 import { Ocean } from './ocean';
+import { Sky } from './skybox'; 
 
 export class Scene extends THREE.Scene {
     private controls: any;
@@ -51,6 +52,8 @@ export class Scene extends THREE.Scene {
         this.background = new THREE.Color(this.backgroundColor);
 
         this.ocean = new Ocean(this, renderer, camera, this.light);
+
+        new Sky(this);
 
         new Island(
             this,

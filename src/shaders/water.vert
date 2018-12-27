@@ -115,7 +115,7 @@ void main() {
     vec2 displacementPosition = vec2(vPosition.x, vPosition.z);
 
     //noise = abs(snoise(time * pos * 0.5));
-    noise = 0.5 * abs(srnoise(5.0 * displacementPosition, 0.2 * time));
+    noise = 0.5 * abs(srnoise(5.0 * displacementPosition, 0.15 * time));
 
     vPosition.y = vPosition.y * noise;
 

@@ -45,7 +45,7 @@ export class Ocean extends THREE.Mesh
 
                 m.needsUpdate = true;
 
-                let g = new THREE.BoxBufferGeometry(15, 0.2, 15, 100, 1, 100);
+                let g = new THREE.BoxBufferGeometry(25, 0.2, 25, 150, 1, 150);
 
                 this.mesh = new THREE.Mesh(g, m);
                 //this.ocean.position.y = -0.05;
