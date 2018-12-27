@@ -92,6 +92,7 @@ float snoise(vec3 v)
 
 uniform float islandRadius;
 uniform float beachWidth;
+uniform sampler2D reflectionMap;
 
 varying float noise;
 varying vec3 vPosition;
@@ -120,7 +121,7 @@ void main() {
   //float distanceToIslandEdge = abs(islandRadius - distanceToOrigin);
   float waterToFoam = smoothstep(islandRadius + 0.07, islandRadius, distanceToOrigin);
   waterColor = mix(waterColor, waterFoam, waterToFoam);
-  
-  //else
-    gl_FragColor = waterColor;
+
+  gl_FragColor = waterColor;
+
 }

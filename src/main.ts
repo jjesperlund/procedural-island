@@ -36,7 +36,7 @@ export class Main {
         this.controls.minDistance = 0;
 
         // create the scene
-        this.scene = new Scene(this.camera, this.controls);
+        this.scene = new Scene(this.camera, this.renderer, this.controls);
 
         // Initial size update set to canvas container
         this.updateSize();
