@@ -107,17 +107,27 @@ uniform float time;
 
 varying float noise;
 varying vec3 vPosition;
+varying vec3 vViewPosition;
+varying vec3 vNormal;
 
 void main() {
 
     vPosition = position;
     //float trans_speed = time * 0.01;
-    vec2 displacementPosition = vec2(vPosition.x, vPosition.z);
+    vec2 displacementPosition = vPosition.xz;
 
     //noise = abs(snoise(time * pos * 0.5));
-    noise = 0.5 * abs(srnoise(5.0 * displacementPosition, 0.15 * time));
+    noise = 0.1 * abs(srnoise(5.0 * displacementPosition, 0.2 * time));
 
     vPosition.y = vPosition.y * noise;
+
+    //Elevate ocean to hide island plane
+    vPosition.y += 0.01;
+
+    //Transform vertex into eye space
+    vViewPosition = vec3(modelViewMatrix * vec4( vPosition, 1.0 )); 
+    //Transform vertex normal into eye space
+    vNormal = vec3(modelViewMatrix * vec4(normal, 0.0));
 
     gl_Position = projectionMatrix *
                 modelViewMatrix *

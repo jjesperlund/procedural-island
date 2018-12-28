@@ -16,12 +16,12 @@ export class Scene extends THREE.Scene {
         this.controls = controls;
 
         // add axis to the scene
-        let axis = new THREE.AxesHelper(15);
-        this.add(axis);
+        //let axis = new THREE.AxesHelper(15);
+        //this.add(axis);
 
         // add lights
-        this.light = new THREE.PointLight(0xffffff, 8.0, 0, 2);
-        this.light.position.set(5, 5, 1);
+        this.light = new THREE.PointLight(0xffffff, 12.0, 0, 2);
+        this.light.position.set(8, 6, 1);
         /*
         light.castShadow = true; 
         light.shadow.mapSize.width = 1024;
@@ -51,7 +51,7 @@ export class Scene extends THREE.Scene {
 
         this.background = new THREE.Color(this.backgroundColor);
 
-        this.ocean = new Ocean(this, renderer, camera, this.light);
+        this.ocean = new Ocean(this, renderer, camera, this.light, this.controls);
 
         new Sky(this);
 
