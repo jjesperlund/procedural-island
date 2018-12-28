@@ -97,15 +97,18 @@ void main() {
 
     vec4 res_color;
     vec4 skyColor = vec4(143.0/255.0, 190.0/255.0, 227.0/255.0, 1.0);
-    vec4 horizonColor = vec4(220.0/255.0, 230.0/255.0, 255.0/255.0, 1.0);
+    vec4 horizonColor = vec4(193.0/255.0, 240.0/255.0, 255.0/255.0, 1.0);
 
-    float clouds = 0.3 * snoise(0.1 * vPosition); // + 0.75 * snoise(2.0 * vPosition);
+    float horizonGradient_endY = 2.0;
+    float clouds_startY = 2.0;
+    float skyBoxRadius = 12.5;
+
+    float clouds = 0.6 * snoise(0.1 * vPosition); // + 0.75 * snoise(2.0 * vPosition);
     float cloudsTransition = smoothstep(0.1, 0.9, clouds);
+    cloudsTransition *= smoothstep(clouds_startY, skyBoxRadius, abs(vPosition.y));
     res_color = mix(skyColor, horizonColor, cloudsTransition);
 
-
-    float horizonGradientStart = 2.0;
-    float horizon = smoothstep(0.0, horizonGradientStart, abs(vPosition.y));
+    float horizon = smoothstep(0.0, horizonGradient_endY, abs(vPosition.y));
 
     res_color = mix(horizonColor, res_color, horizon);
     gl_FragColor = res_color;
