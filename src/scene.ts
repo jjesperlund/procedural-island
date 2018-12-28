@@ -20,8 +20,20 @@ export class Scene extends THREE.Scene {
         //this.add(axis);
 
         // add lights
-        this.light = new THREE.PointLight(0xffffff, 12.0, 0, 2);
-        this.light.position.set(8, 6, 1);
+        this.light = new THREE.PointLight(0xffffff, 20, 0, 2);
+        this.light.position.set(10, 8, 1);
+
+        // add sun with emissive color
+        let sun_geometry = new THREE.SphereBufferGeometry(0.7, 20, 20);
+        let sun_material = new THREE.MeshLambertMaterial({ 
+            emissive: new THREE.Color(1, 0.95, 0.7),
+            emissiveIntensity: 1,
+            opacity: 0.9, 
+            transparent: true 
+        });
+        let sun = new THREE.Mesh(sun_geometry, sun_material);
+        sun.position.set(10, 8, 1);
+        this.add(sun);
         /*
         light.castShadow = true; 
         light.shadow.mapSize.width = 1024;
@@ -35,8 +47,8 @@ export class Scene extends THREE.Scene {
         */
         this.add(this.light);
 
-        var helper = new THREE.PointLightHelper( this.light, 1 );
-        this.add( helper );
+        //var helper = new THREE.PointLightHelper( this.light, 1 );
+        //this.add( helper );
         
        //var light = new THREE.SpotLight( 0xffffff, 0.1, 1000, 0.2 );
        //light.position.set(800, 50, 100);
@@ -66,7 +78,6 @@ export class Scene extends THREE.Scene {
     }
 
     update() {
-        //this.light.rotateY(Math.PI / 100);
         this.ocean.update();
     }
 }

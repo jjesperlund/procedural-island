@@ -117,12 +117,12 @@ struct PointLight {
 
 uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
 
-vec4 computeLighting(vec3 vViewPosition, vec3 N) 
+vec4 computeLighting(vec3 vViewPosition, vec3 N, float distanceToOrigin, float islandRadius) 
 {
     float Kd;
     float Ka = 0.8;
     float Ks = 0.0;
-    float specularShininess = 100.0;
+    float specularShininess = 120.0;
 
     vec3 ambientColor = vec3(1., 1., 1.);
     vec3 diffuseColor = pointLights[0].color;
@@ -151,9 +151,10 @@ vec4 computeLighting(vec3 vViewPosition, vec3 N)
         }
     }
 
-    //vec3 ambientLighting =  * Ka;
-    //vec3 diffuseLighting =  * Kd;
-    //return vec4(ambientLighting + diffuseLighting, 1.0);
+    // Reduce specular reflection of the white water foam
+    if (distanceToOrigin < islandRadius + 0.05) {
+      Ks *= 0.3;
+    }
 
     return vec4(Ka * ambientColor +
                 Kd * diffuseColor +
@@ -188,7 +189,7 @@ void main() {
   // Calculate new normal for each facet after displacement
   vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
 
-  vec4 lighting = computeLighting(vViewPosition, newNormal);
+  vec4 lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
 
   gl_FragColor = waterColor * lighting;
 

@@ -5,7 +5,7 @@ export class Camera extends THREE.PerspectiveCamera {
     constructor(aspectRatio) {
         super(60, aspectRatio, 0.01, 30);
 
-        this.position.set( 0, 3, -3 );
+        this.position.set( 0, 6, -6 );
         //this.lookAt( 0, -100, 0 );
     }
 
