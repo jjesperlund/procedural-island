@@ -29,7 +29,7 @@ export class Sky
 
                 m.side = THREE.BackSide;
 
-                let g = new THREE.SphereBufferGeometry(12.5, 30, 30, 0, 2 * Math.PI, 0, Math.PI/2);
+                let g = new THREE.SphereBufferGeometry(12.5, 70, 70, 0, 2 * Math.PI, 0, Math.PI/2);
 
                 let mesh = new THREE.Mesh(g, m);
                 scene.add(  mesh);                

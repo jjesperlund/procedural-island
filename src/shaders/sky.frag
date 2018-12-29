@@ -1,3 +1,6 @@
+// Enable extenstion to access dFdx(), dFdy()
+#extension GL_OES_standard_derivatives : enable
+
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
 }
@@ -90,6 +93,14 @@ float snoise(vec3 v)
                                 dot(p2,x2), dot(p3,x3) ) );
   }
 
+float aastep(float threshold, float value) {
+  #ifdef GL_OES_standard_derivatives
+    float afwidth = 0.7 * length(vec2(dFdx(value), dFdy(value)));
+  #else
+    float afwidth = frequency * (1.0/200.0) / uScale / cos(uYrot);
+  #endif
+    return smoothstep(threshold-afwidth, threshold+afwidth, value);
+}
 
 varying vec3 vPosition;
 
@@ -98,6 +109,7 @@ void main() {
     vec4 res_color;
     vec4 skyColor = vec4(143.0/255.0, 190.0/255.0, 227.0/255.0, 1.0);
     vec4 horizonColor = vec4(193.0/255.0, 240.0/255.0, 255.0/255.0, 1.0);
+    vec4 oceanColor = vec4(0.1, 0.1, 0.8, 1.0);
 
     float horizonGradient_endY = 2.0;
     float clouds_startY = 2.0;
@@ -109,8 +121,13 @@ void main() {
     res_color = mix(skyColor, horizonColor, cloudsTransition);
 
     float horizon = smoothstep(0.0, horizonGradient_endY, abs(vPosition.y));
-
     res_color = mix(horizonColor, res_color, horizon);
+
+    // Fix antialiasing where horizon meets ocean by
+    // adding and aastepping a ocean colored line between
+    float horizonToOcean = aastep(0.07, abs(vPosition.y));
+    res_color = mix(oceanColor, res_color, horizonToOcean);
+
     gl_FragColor = res_color;
 
 }

@@ -24,7 +24,7 @@ export class Scene extends THREE.Scene {
         this.light.position.set(10, 8, 1);
 
         // add sun with emissive color
-        let sun_geometry = new THREE.SphereBufferGeometry(0.7, 20, 20);
+        let sun_geometry = new THREE.SphereBufferGeometry(0.7, 30, 30);
         let sun_material = new THREE.MeshLambertMaterial({ 
             emissive: new THREE.Color(1, 0.95, 0.7),
             emissiveIntensity: 1,

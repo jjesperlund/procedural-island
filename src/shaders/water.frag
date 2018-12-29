@@ -153,7 +153,7 @@ vec4 computeLighting(vec3 vViewPosition, vec3 N, float distanceToOrigin, float i
 
     // Reduce specular reflection of the white water foam
     if (distanceToOrigin < islandRadius + 0.05) {
-      Ks *= 0.3;
+      Ks *= 0.2;
     }
 
     return vec4(Ka * ambientColor +
@@ -191,6 +191,12 @@ void main() {
 
   vec4 lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
 
-  gl_FragColor = waterColor * lighting;
+    float r = 0.0, delta = 0.0, alpha = 1.0;
+    vec2 cxy = 2.0 * gl_PointCoord - 1.0;
+    r = dot(cxy, cxy);
+    delta = fwidth(r);
+    alpha = smoothstep(1.0 - delta, 1.0 + delta, r);
+
+  gl_FragColor = waterColor * lighting * alpha;
 
 }
