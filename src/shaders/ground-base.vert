@@ -148,10 +148,10 @@ float snoise(vec3 v)
 
       float mountainsDecayStart = beachWidth * 7.0;
       float vegetationEnd= islandRadius - 0.6;
-      float vegetationStart = islandRadius - beachWidth * 2.2;
+      float vegetationStart = islandRadius - beachWidth * 2.1;
 
       // Trees      
-      float ttt_noise = 0.4 * snoise(30.5 * (position + 0.5));
+      float ttt_noise = 0.4 * snoise(25.5 * (position));
       ttt_noise *= 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
       vWorldPosition.y += step(0.2, ttt_noise);
 

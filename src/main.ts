@@ -32,8 +32,9 @@ export class Main {
 
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = true;
-        this.controls.maxDistance = 15;
-        this.controls.minDistance = 0;
+        this.controls.maxDistance = 13;
+        this.controls.minDistance = 3;
+        this.controls.maxPolarAngle = Math.PI/2.15;
 
         // create the scene
         this.scene = new Scene(this.camera, this.renderer, this.controls);

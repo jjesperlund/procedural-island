@@ -102,20 +102,22 @@ float aastep(float threshold, float value) {
     return smoothstep(threshold-afwidth, threshold+afwidth, value);
 }
 
+uniform vec3 sunPosition;
 varying vec3 vPosition;
 
 void main() {
 
     vec4 res_color;
-    vec4 skyColor = vec4(143.0/255.0, 190.0/255.0, 227.0/255.0, 1.0);
-    vec4 horizonColor = vec4(193.0/255.0, 240.0/255.0, 255.0/255.0, 1.0);
+    vec4 skyColor = vec4(123.0/255.0, 170.0/255.0, 227.0/255.0, 1.0);
+    vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
     vec4 oceanColor = vec4(0.1, 0.1, 0.8, 1.0);
+    vec4 sunColor = vec4(1.0, 1.0, 0.75, 1.0);
 
     float horizonGradient_endY = 2.0;
     float clouds_startY = 2.0;
     float skyBoxRadius = 12.5;
 
-    float clouds = 0.6 * snoise(0.1 * vPosition); // + 0.75 * snoise(2.0 * vPosition);
+    float clouds = 0.9 * snoise(0.14 * vPosition); // + 0.75 * snoise(2.0 * vPosition);
     float cloudsTransition = smoothstep(0.1, 0.9, clouds);
     cloudsTransition *= smoothstep(clouds_startY, skyBoxRadius, abs(vPosition.y));
     res_color = mix(skyColor, horizonColor, cloudsTransition);
@@ -127,6 +129,15 @@ void main() {
     // adding and aastepping a ocean colored line between
     float horizonToOcean = aastep(0.07, abs(vPosition.y));
     res_color = mix(oceanColor, res_color, horizonToOcean);
+
+    // Sun
+    float sunRadius = 1.0;
+    float distanceToSunCenter = length(vPosition - sunPosition);
+
+    // Draw sun if distance to sun is less than sun radius and
+    // aastep sun edge to avoid antialiasing
+    float sunEdge = aastep(sunRadius, distanceToSunCenter);
+    res_color = mix(sunColor, res_color, sunEdge);
 
     gl_FragColor = res_color;
 

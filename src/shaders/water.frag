@@ -191,12 +191,6 @@ void main() {
 
   vec4 lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
 
-    float r = 0.0, delta = 0.0, alpha = 1.0;
-    vec2 cxy = 2.0 * gl_PointCoord - 1.0;
-    r = dot(cxy, cxy);
-    delta = fwidth(r);
-    alpha = smoothstep(1.0 - delta, 1.0 + delta, r);
-
-  gl_FragColor = waterColor * lighting * alpha;
+  gl_FragColor = waterColor * lighting;
 
 }

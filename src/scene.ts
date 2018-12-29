@@ -22,29 +22,6 @@ export class Scene extends THREE.Scene {
         // add lights
         this.light = new THREE.PointLight(0xffffff, 20, 0, 2);
         this.light.position.set(10, 8, 1);
-
-        // add sun with emissive color
-        let sun_geometry = new THREE.SphereBufferGeometry(0.7, 30, 30);
-        let sun_material = new THREE.MeshLambertMaterial({ 
-            emissive: new THREE.Color(1, 0.95, 0.7),
-            emissiveIntensity: 1,
-            opacity: 0.9, 
-            transparent: true 
-        });
-        let sun = new THREE.Mesh(sun_geometry, sun_material);
-        sun.position.set(10, 8, 1);
-        this.add(sun);
-        /*
-        light.castShadow = true; 
-        light.shadow.mapSize.width = 1024;
-        light.shadow.mapSize.height = 1024;
-        light.shadow.camera.left = -1000;
-        light.shadow.camera.right = 1000;
-        light.shadow.camera.top = 1000;
-        light.shadow.camera.bottom = -1000;
-        light.shadow.camera.near = 0.5;
-        light.shadow.camera.far = 1000;
-        */
         this.add(this.light);
 
         //var helper = new THREE.PointLightHelper( this.light, 1 );

@@ -1,3 +1,4 @@
+
 // Modulo 289, optimizes to code without divisions
 vec3 mod289(vec3 x) {
   return x - floor(x * (1.0 / 289.0)) * 289.0;
@@ -113,11 +114,11 @@ varying vec3 vNormal;
 void main() {
 
     vPosition = position;
-    //float trans_speed = time * 0.01;
+    float noise_speed = 0.22 * time;
     vec2 displacementPosition = vPosition.xz;
 
     //noise = abs(snoise(time * pos * 0.5));
-    noise = 0.08 * abs(srnoise(5.0 * displacementPosition, 0.2 * time));
+    noise = 0.08 * abs(srnoise(5.0 * displacementPosition, noise_speed));
 
     vPosition.y = vPosition.y * noise;
 
@@ -126,8 +127,9 @@ void main() {
 
     //Transform vertex into eye space
     vViewPosition = vec3(modelViewMatrix * vec4( vPosition, 1.0 )); 
-    //Transform vertex normal into eye space
+    //Transform vertex normal into eye space to use for shading
     vNormal = vec3(modelViewMatrix * vec4(normal, 0.0));
+
 
     gl_Position = projectionMatrix *
                 modelViewMatrix *
