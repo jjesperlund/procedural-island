@@ -149,18 +149,17 @@ vec4 computeLighting(vec3 vViewPosition, vec3 newNormal)
     return vec4(ambientLighting + diffuseLighting, 1.0);
 }
 
-vec4 addGreens(vec3 vWorldPosition, vec4 island_color, vec3 vNormal, vec3 newNormal)
+vec4 addVegetation(vec3 vWorldPosition, vec4 island_color)
 {
-    float greensNoise = 1.5 * snoise(70. * vWorldPosition);// + 10.0 * snoise(30. * vWorldPosition);
-    float greens_color_step = smoothstep(0.4, 0.6, greensNoise);
+    float vegetationEnd= islandRadius - 0.7;
+    float vegetationStart = islandRadius - beachWidth * 2.2;
+
+    float greensNoise = 1.0 * snoise(100. * vWorldPosition) + 0.5 * snoise(150. * vWorldPosition);
+    float greens_color_step = smoothstep(0.3, 0.6, greensNoise);
     vec4 greens1 = vec4(11.0/255.0, 56.0/255.0, 11.0/255.0, 1.0);
     vec4 greens2 = vec4(15.0/255.0, 63.0/255.0, 15.0/255.0, 1.0);
     vec4 greens_color = mix(greens1, greens2, greens_color_step);
-
-    // Calculate elevation angle (vNormal = vec3(0, 1, 0))
-    // Big elevation angle means no vegetation grow there
-    float elevationAngle = abs(dot(newNormal, vNormal));
-    float greens_step = smoothstep(0.7, 0.9, elevationAngle);
+    float greens_step = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
 
     return mix(island_color, greens_color, greens_step);
 }
@@ -180,34 +179,15 @@ void main() {
 
     // Mountains
     vec4 mountain_color1 = vec4(93.0/255.0, 91.0/255.0, 86.0/255.0, 1.0);
-    vec4 mountain_color2 = vec4(89.0/255.0, 87.0/255.0, 82.0/255.0, 1.0);
-    float mountainNoise = 20.0 * snoise(70. * vWorldPosition)+ 10.0 * snoise(30. * vWorldPosition);
-    float color_step = smoothstep(0.1, 0.9, mountainNoise);
+    vec4 mountain_color2 = vec4(87.0/255.0, 85.0/255.0, 80.0/255.0, 1.0);
+    float mountainNoise = 20.0 * snoise(70. * vWorldPosition) + 
+                          10.0 * snoise(120. * vWorldPosition) +
+                          5.0 * snoise(240. * vWorldPosition);
+    float color_step = smoothstep(0.6, 0.7, mountainNoise);
     island_color = mix(mountain_color1, mountain_color2, color_step);
 
-    // Greens
-    //island_color = addGreens(vWorldPosition, island_color, vNormal, newNormal);
-    float vegetationEnd= islandRadius - 0.7;
-    float vegetationStart = islandRadius - beachWidth * 2.2;
-
-    // Trees      
-    //float ttt_noise = 0.8 * snoise(35.5 * (position + 0.5));
-    /*
-    float ttt_noise = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
-    vec4 c1 = vec4(0.0, 0.3 * ttt_noise, 0.1, 1.0); 
-    island_color = mix(island_color, c1, ttt_noise);
-    */
-
-    float greensNoise = 1.5 * snoise(100. * vWorldPosition);// + 10.0 * snoise(30. * vWorldPosition);
-    float greens_color_step = smoothstep(0.3, 0.6, greensNoise);
-    vec4 greens1 = vec4(11.0/255.0, 56.0/255.0, 11.0/255.0, 1.0);
-    vec4 greens2 = vec4(15.0/255.0, 63.0/255.0, 15.0/255.0, 1.0);
-    vec4 greens_color = mix(greens1, greens2, greens_color_step);
-    float greens_step = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
-    island_color = mix(island_color, greens_color, greens_step);
-
-
-    vec4 background_color = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0); //temp
+    // Tree forrest      
+    island_color = addVegetation(vWorldPosition, island_color);
 
     // Beach
     vec4 sand1 = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0);
@@ -222,6 +202,6 @@ void main() {
 
     vec4 lighting = computeLighting(vViewPosition, newNormal);
 
-    gl_FragColor = mix(background_color, island_color, islandEdge) * lighting;
+    gl_FragColor = island_color * lighting;
 
 }

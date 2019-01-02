@@ -158,9 +158,6 @@ float snoise(vec3 v)
       // Smoothstep mountains to decay as the distance from origin increases
       vWorldPosition.y *= smoothstep(islandRadius - mountainsDecayStart/ 15.0, islandRadius - mountainsDecayStart, distanceToOrigin);
 
-      // Step vegetation to beach transition
-      vWorldPosition.y *= smoothstep(0.1, 0.2, islandRadius - distanceToOrigin);
-
       // Beach elevation decay to ocean
       vWorldPosition.y += 0.07; 
       vWorldPosition.y *= smoothstep(islandRadius + 0.05, islandRadius - beachWidth, distanceToOrigin);
