@@ -147,20 +147,19 @@ float snoise(vec3 v)
       distanceToOrigin += radiusNoise;
 
       float mountainsDecayStart = beachWidth * 7.0;
-      float vegetationEnd= islandRadius - 0.6;
-      float vegetationStart = islandRadius - beachWidth * 2.1;
+      float vegetationEnd = islandRadius - 0.6;
+      float vegetationStart = islandRadius - beachWidth * 1.5;
 
-      // Trees      
-      float ttt_noise = 0.4 * snoise(25.5 * (position));
-      ttt_noise *= 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
-      vWorldPosition.y += step(0.2, ttt_noise);
+      // Vegetation (tree forrest)      
+      float vegetation_noise = 0.6 * snoise(15.0 * position) + 0.2 * snoise(30.0 * position);
+      float vegetation_step = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
+      vWorldPosition.y += (1.0 - vegetation_noise) * vegetation_step;
 
       // Smoothstep mountains to decay as the distance from origin increases
       vWorldPosition.y *= smoothstep(islandRadius - mountainsDecayStart/ 15.0, islandRadius - mountainsDecayStart, distanceToOrigin);
 
       // Step vegetation to beach transition
-      vWorldPosition.y *= step(0.2, islandRadius - distanceToOrigin);
-
+      vWorldPosition.y *= smoothstep(0.1, 0.2, islandRadius - distanceToOrigin);
 
       // Beach elevation decay to ocean
       vWorldPosition.y += 0.07; 

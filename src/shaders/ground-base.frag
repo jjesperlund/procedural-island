@@ -179,8 +179,8 @@ void main() {
     //vec4 background_color = vec4(vec3(backgroundColor), 1.0);
 
     // Mountains
-    vec4 mountain_color1 = vec4(91.0/255.0, 89.0/255.0, 84.0/255.0, 1.0);
-    vec4 mountain_color2 = vec4(99.0/255.0, 97.0/255.0, 92.0/255.0, 1.0);
+    vec4 mountain_color1 = vec4(93.0/255.0, 91.0/255.0, 86.0/255.0, 1.0);
+    vec4 mountain_color2 = vec4(89.0/255.0, 87.0/255.0, 82.0/255.0, 1.0);
     float mountainNoise = 20.0 * snoise(70. * vWorldPosition)+ 10.0 * snoise(30. * vWorldPosition);
     float color_step = smoothstep(0.1, 0.9, mountainNoise);
     island_color = mix(mountain_color1, mountain_color2, color_step);
@@ -192,17 +192,28 @@ void main() {
 
     // Trees      
     //float ttt_noise = 0.8 * snoise(35.5 * (position + 0.5));
+    /*
     float ttt_noise = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
     vec4 c1 = vec4(0.0, 0.3 * ttt_noise, 0.1, 1.0); 
     island_color = mix(island_color, c1, ttt_noise);
+    */
+
+    float greensNoise = 1.5 * snoise(100. * vWorldPosition);// + 10.0 * snoise(30. * vWorldPosition);
+    float greens_color_step = smoothstep(0.3, 0.6, greensNoise);
+    vec4 greens1 = vec4(11.0/255.0, 56.0/255.0, 11.0/255.0, 1.0);
+    vec4 greens2 = vec4(15.0/255.0, 63.0/255.0, 15.0/255.0, 1.0);
+    vec4 greens_color = mix(greens1, greens2, greens_color_step);
+    float greens_step = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
+    island_color = mix(island_color, greens_color, greens_step);
+
 
     vec4 background_color = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0); //temp
 
     // Beach
     vec4 sand1 = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0);
     vec4 sand2 = vec4(182./255., 172./255., 153./255., 1.0);
-    float sandNoise = 5.0 * snoise(40. * vWorldPosition);
-    color_step = smoothstep(0.2, 0.9, sandNoise);
+    float sandNoise = 2.0 * snoise(50. * vWorldPosition);
+    color_step = smoothstep(0.1, 0.9, sandNoise);
     vec4 beach_color = mix(sand1, sand2, color_step);
 
     // Mountains to beach transition

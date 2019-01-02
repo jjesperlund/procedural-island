@@ -173,11 +173,11 @@ void main() {
   distanceToOrigin += radiusNoise;
 
   vec4 waterColor = vec4(0.0, 0.15 * noise, 0.3 * noise + 0.6, 1.0);
-  vec4 shallowWaterColor = vec4(0.3 * noise + 0.3, 0.3 * noise + 0.5, 0.3 * noise + 1.0, 1.0);
+  vec4 shallowWaterColor = vec4(0.3 * noise + 0.25, 0.3 * noise + 0.45, 0.3 * noise + 0.95, 1.0);
   vec4 waterFoam = vec4(noise + 0.7, noise + 0.7, noise + 0.7, 1.0);
 
   // Deep water to shallow water transition
-  float shallowBegin = islandRadius + beachWidth * 5.0;
+  float shallowBegin = islandRadius + beachWidth * 9.0;
   float deepToShallow = smoothstep(shallowBegin, islandRadius, distanceToOrigin);
   waterColor = mix(waterColor, shallowWaterColor, deepToShallow);
 

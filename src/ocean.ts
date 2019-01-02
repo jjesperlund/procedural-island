@@ -64,11 +64,12 @@ export class Ocean extends THREE.Mesh
                 this.scene.add(this.mesh);    
                 */
                 for (var i = 0; i < numberOfLODS; i++) {
-                    const g = new THREE.BoxBufferGeometry(25, 0.2, 25, 700 - i * 200, 1, 700 - i * 200);
+                    const g = new THREE.BoxBufferGeometry(25, 0.2, 25, 800 - i * 200, 1, 800 - i * 200);
                     var ocean = new THREE.Mesh(g, m);
-                    this.LODNode.addLevel(ocean, i * 2 + 3);
+                    this.LODNode.addLevel(ocean, i * 2 + 5);
                 }
-                scene.add(this.LODNode);            
+                scene.add(this.LODNode);   
+                this.LODNode.update(camera);         
 
             });
         });

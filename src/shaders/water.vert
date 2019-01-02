@@ -118,9 +118,9 @@ void main() {
     vec2 displacementPosition = vPosition.xz;
 
     //noise = abs(snoise(time * pos * 0.5));
-    noise = 0.08 * abs(srnoise(5.0 * displacementPosition, noise_speed));
+    noise = 0.1 * abs(srnoise(5.0 * displacementPosition, noise_speed));
 
-    vPosition.y = vPosition.y * noise;
+    vPosition.y *= noise;
 
     //Elevate ocean to hide island plane
     vPosition.y += 0.01;

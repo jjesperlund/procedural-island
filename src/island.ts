@@ -51,19 +51,11 @@ export class Island
                     
                 for (var i = 0; i < numberOfLODS; i++) {
                     const g = new THREE.BoxBufferGeometry(6, 0.05, 6, 300 - i * 55, 1, 300 - i * 55);
-                    // let g = new THREE.PlaneGeometry(500, 500, 200, 200);
-                    // const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(1.0, 0.5, 0.5) });
                     var island = new THREE.Mesh(g, m);
                     this.LODNode.addLevel(island, i * 2 + 3);
                 }
                 scene.add(this.LODNode);
-                /*
-                const g = new THREE.BoxBufferGeometry(6, 0.05, 6, 200, 1, 200);
-                // let g = new THREE.PlaneGeometry(500, 500, 200, 200);
-                // const m = new THREE.MeshLambertMaterial({ color: new THREE.Color(1.0, 0.5, 0.5) });
-                this.island = new THREE.Mesh(g, m);
-                this.add(this.island);
-                */
+                this.LODNode.update(camera);
             });
             
         });
