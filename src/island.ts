@@ -19,7 +19,7 @@ export class Island
     };
 
     constructor(scene, camera, light, backgroundColor, controls) {
-        const numberOfLODS = 5;
+        const numberOfLODS = 3;
 
         this.loadShader('/src/shaders/ground-base.vert', (vsErr, vsText) => { 
             this.loadShader('/src/shaders/ground-base.frag', (frErr, frText) => { 
