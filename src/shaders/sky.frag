@@ -110,7 +110,7 @@ void main() {
     vec4 res_color;
     vec4 skyColor = vec4(123.0/255.0, 170.0/255.0, 227.0/255.0, 1.0);
     vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
-    vec4 oceanColor = vec4(0.1, 0.1, 0.8, 1.0);
+    vec4 oceanColor = vec4(0.05, 0.05, 0.70, 1.0);
     vec4 sunColor = vec4(1.0, 1.0, 0.75, 1.0);
 
     float horizonGradient_endY = 2.0;
@@ -127,15 +127,18 @@ void main() {
 
     // Fix antialiasing where horizon meets ocean by
     // adding and aastepping a ocean colored line between
-    float horizonToOcean = aastep(0.07, abs(vPosition.y));
+    // (This because we don't have access to the resulting ocean color here)
+    /*
+    float horizonToOcean = aastep(0.1, abs(vPosition.y));
     res_color = mix(oceanColor, res_color, horizonToOcean);
+    */
 
     // Sun
     float sunRadius = 1.0;
     float distanceToSunCenter = length(vPosition - sunPosition);
 
     // Draw sun if distance to sun is less than sun radius and
-    // aastep sun edge to avoid antialiasing
+    // aastep sun edge to avoid aliasing
     float sunEdge = aastep(sunRadius, distanceToSunCenter);
     res_color = mix(sunColor, res_color, sunEdge);
 

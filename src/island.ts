@@ -4,6 +4,7 @@ import * as THREE from 'three'
 export class Island
  {
     private LODNode: THREE.LOD = new THREE.LOD();
+    private camera: any;
 
     loadShader( path, callback ) {
         var request = new XMLHttpRequest();
@@ -18,16 +19,17 @@ export class Island
         request.send();
     };
 
-    constructor(scene, camera, light, backgroundColor, controls) {
+    constructor(scene, camera, light, backgroundColor, controls, GUIControls) {
         const numberOfLODS = 3;
 
-        this.loadShader('/src/shaders/ground-base.vert', (vsErr, vsText) => { 
-            this.loadShader('/src/shaders/ground-base.frag', (frErr, frText) => { 
+        this.camera = camera;
+
+        this.loadShader('/src/shaders/island.vert', (vsErr, vsText) => { 
+            this.loadShader('/src/shaders/island.frag', (frErr, frText) => { 
 
                 let uniforms = {
-                    scale: { type: "f", value: 0.1 },
-                    displacement: { type: "f", value: 1.0},
-                    time: { type: "f", value: 10.0 },
+                    islandWobbliness: { type: "f", value: GUIControls.islandWobbliness },
+                    amountMountain: { type: "f", value: GUIControls.amountMountain },
                     backgroundColor: { type: "v3", value: backgroundColor },
                     islandRadius: { type: "f", value: 2.5 },
                     beachWidth: { type: "f", value: 0.2 },
@@ -60,17 +62,28 @@ export class Island
             
         });
 
-        // Update camera position and send to shaders when view changes
+        // When view changes, send new camera position to shaders
         controls.addEventListener( 'change', () => {
             this.LODNode.update(camera);
-            /*
-            if (this.island.material) {
-                // @ts-ignore
-                this.island.material.uniforms.cameraPos.value = this.cameraPosition;
+            let currentLODMesh = this.LODNode.getObjectForDistance(camera.position.length());
+
+            // @ts-ignore
+            if (currentLODMesh.material) {   
+                // @ts-ignore  
+                currentLODMesh.material.uniforms.cameraPos.value = camera.position;
             }
-            */
         });
 
+    }
+
+    update(amountWobbliness, amountMountain) {
+        if (this.LODNode.children.length > 0) {
+            let currentLODMesh = this.LODNode.getObjectForDistance(this.camera.position.length());
+            // @ts-ignore  
+            currentLODMesh.material.uniforms.islandWobbliness.value = amountWobbliness;
+            // @ts-ignore  
+            currentLODMesh.material.uniforms.amountMountain.value = amountMountain;
+        }
     }
 
 }

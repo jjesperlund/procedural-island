@@ -95,6 +95,7 @@ float snoise(vec3 v)
 
 uniform float islandRadius;
 uniform float beachWidth;
+uniform float islandWobbliness;
 
 varying float noise;
 varying vec3 vPosition;
@@ -152,24 +153,39 @@ vec4 computeLighting(vec3 vViewPosition, vec3 N, float distanceToOrigin, float i
     }
 
     // Reduce specular reflection of the white water foam
-    if (distanceToOrigin < islandRadius + 0.05) {
+    if (distanceToOrigin < islandRadius + 0.05) 
+    {
       Ks *= 0.2;
-    }
+    } 
 
     return vec4(Ka * ambientColor +
                 Kd * diffuseColor +
                 Ks * specularColor, 1.0);
 }
 
+float aastep(float threshold, float value) 
+{
+  #ifdef GL_OES_standard_derivatives
+    float afwidth = length(vec2(dFdx(value), dFdy(value)));
+  #else
+    float afwidth = frequency * (1.0/200.0) / uScale / cos(uYrot);
+  #endif
+    return smoothstep(threshold-afwidth, threshold+afwidth, value);
+}
+
 void main() {
+
+  vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
+  vec4 lighting = vec4(1.0);
 
   /* --- Distance in xz-plane from position to plane origin ----------------------------------------- */
   vec2 position_xz = vPosition.xz;
   float distanceToOrigin = sqrt(dot(position_xz, position_xz));
+
   // Add noise to island radius to not make the island perfectly circular
-  float freq = 0.4;
-  float amplitude = 0.4;
-  float radiusNoise = amplitude * snoise(freq * vec3(position_xz, 1.0));
+  float frequency = islandWobbliness * 0.4;
+  float amplitude = islandWobbliness;
+  float radiusNoise = amplitude * snoise(frequency * vec3(position_xz, 1.0));
   distanceToOrigin += radiusNoise;
 
   vec4 waterColor = vec4(0.0, 0.15 * noise, 0.3 * noise + 0.6, 1.0);
@@ -186,10 +202,16 @@ void main() {
   float waterToFoam = smoothstep(islandRadius + 0.07, islandRadius, distanceToOrigin);
   waterColor = mix(waterColor, waterFoam, waterToFoam);
 
+  float oceanToHorizon = aastep(12.4, sqrt(dot(position_xz, position_xz)));
+  waterColor = mix(waterColor, horizonColor, oceanToHorizon);
+
   // Calculate new normal for each facet after displacement
   vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
 
-  vec4 lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
+    if (sqrt(dot(position_xz, position_xz)) < 12.4) 
+    {
+      lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
+    }
 
   gl_FragColor = waterColor * lighting;
 

@@ -149,13 +149,14 @@ vec4 computeLighting(vec3 vViewPosition, vec3 newNormal)
     return vec4(ambientLighting + diffuseLighting, 1.0);
 }
 
-vec4 addVegetation(vec3 vWorldPosition, vec4 island_color)
+vec4 addVegetation(vec3 vWorldPosition, vec4 island_color, float noiseMult, float freqMult)
 {
     float vegetationEnd= islandRadius - 0.7;
     float vegetationStart = islandRadius - beachWidth * 2.2;
 
-    float greensNoise = 1.0 * snoise(100. * vWorldPosition) + 0.5 * snoise(150. * vWorldPosition);
-    float greens_color_step = smoothstep(0.3, 0.6, greensNoise);
+    float greensNoise = noiseMult * 0.5 * snoise(70.0 * freqMult * vWorldPosition); //+ 
+                        //noiseMult/ * snoise(150. * vWorldPosition);
+    float greens_color_step = smoothstep(0.1, 0.9, greensNoise);
     vec4 greens1 = vec4(11.0/255.0, 56.0/255.0, 11.0/255.0, 1.0);
     vec4 greens2 = vec4(15.0/255.0, 63.0/255.0, 15.0/255.0, 1.0);
     vec4 greens_color = mix(greens1, greens2, greens_color_step);
@@ -167,33 +168,35 @@ vec4 addVegetation(vec3 vWorldPosition, vec4 island_color)
 
 void main() {
 
-    // Create 'illusion' of a disc by 'fragment clipping': assigning 
-    // positions outside islandRadius the same color as the background
+    float maxCameraDistanceToOrigin = 14.0;
+    float cameraDistanceToOrigin = length(cameraPos);
+    
+    // Mapping the noise gain and frequency to the viewing distance
+    float noiseMultiplier = maxCameraDistanceToOrigin - cameraDistanceToOrigin;
+    float freqMultiplier = noiseMultiplier * 0.5;
+
     vec4 island_color;
 
     // Calculate new normal for each facet after displacement
     vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
     
     float islandEdge = smoothstep(islandRadius + beachWidth / 5.0, islandRadius - beachWidth / 5.0, distanceToOrigin);
-    //vec4 background_color = vec4(vec3(backgroundColor), 1.0);
 
     // Mountains
     vec4 mountain_color1 = vec4(93.0/255.0, 91.0/255.0, 86.0/255.0, 1.0);
     vec4 mountain_color2 = vec4(87.0/255.0, 85.0/255.0, 80.0/255.0, 1.0);
-    float mountainNoise = 20.0 * snoise(70. * vWorldPosition) + 
-                          10.0 * snoise(120. * vWorldPosition) +
-                          5.0 * snoise(240. * vWorldPosition);
-    float color_step = smoothstep(0.6, 0.7, mountainNoise);
+    float mountainNoise = noiseMultiplier * snoise(20.0 * noiseMultiplier * vWorldPosition);
+    float color_step = smoothstep(0.1, 0.9, mountainNoise);
     island_color = mix(mountain_color1, mountain_color2, color_step);
 
     // Tree forrest      
-    island_color = addVegetation(vWorldPosition, island_color);
+    island_color = addVegetation(vWorldPosition, island_color, noiseMultiplier, freqMultiplier);
 
     // Beach
     vec4 sand1 = vec4(189.0/255.0, 183.0/255.0, 172.0/255.0, 1.0);
     vec4 sand2 = vec4(182./255., 172./255., 153./255., 1.0);
-    float sandNoise = 2.0 * snoise(50. * vWorldPosition);
-    color_step = smoothstep(0.1, 0.9, sandNoise);
+    float sandNoise = noiseMultiplier * 0.08 * snoise(freqMultiplier * 30.0 * vWorldPosition);
+    color_step = smoothstep(0.1, 0.5, sandNoise);
     vec4 beach_color = mix(sand1, sand2, color_step);
 
     // Mountains to beach transition

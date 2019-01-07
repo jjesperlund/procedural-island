@@ -90,11 +90,10 @@ float snoise(vec3 v)
                                 dot(p2,x2), dot(p3,x3) ) );
   }
 
-    uniform float scale;
-    uniform float displacement;
-    uniform float time;
     uniform float islandRadius;
     uniform float beachWidth;
+    uniform float islandWobbliness;
+    uniform float amountMountain;
     uniform vec3 cameraPos;
 
     varying float res_noise;
@@ -114,16 +113,15 @@ float snoise(vec3 v)
 
     distanceToCamera = length(cameraPos - vWorldPosition); 
 
-    /* --- Noise parameters ----------------------------------------- */
+    /* --- Fundamental island noise ----------------------------------------- */
       // Properties
-      const int octaves = 4;
+      const int octaves = 3;
       float freq_multiplier = 2.0;
       float noise_gain = 0.5;
 
       // Initial values
-      float amplitude = 0.35;
-      //float frequency = (15.0 - distanceToCamera) / 20.0 + 0.6;
-      float frequency = 0.5;
+      float amplitude = 0.2 + amountMountain * 0.5;
+      float frequency = 0.25 + amountMountain * 0.7;
   
       // Loop octaves and calculate summed simplex noise
       for (int i = 0; i < octaves; i++) {
@@ -131,19 +129,22 @@ float snoise(vec3 v)
           frequency *= freq_multiplier;
           amplitude *= noise_gain;
       }
-      res_noise += 0.5;
+      res_noise += 0.3 + (amountMountain * 0.5);
 
       vWorldPosition.x = position.x;
       vWorldPosition.y = position.y + vNormal.y * res_noise;
       vWorldPosition.z = position.z;      
 
-      /* --- Distance in xz-plane from position to plane origin ----------------------------------------- */
+      /* --- Shaping the island ----------------------------------------- */    
       vec2 position_xz = position.xz;
+
+      // Distance in xz-plane from position to plane origin 
       distanceToOrigin = sqrt(dot(position_xz, position_xz));
-      // Add noise to island radius to not make the island perfectly circular
-      float freq = 0.4;
-      amplitude = 0.4;
-      float radiusNoise = amplitude * snoise(freq * vec3(position_xz, 1.0));
+
+      // Add noise to island radius to make the island not perfectly circular
+      frequency = islandWobbliness * 0.4;
+      amplitude = islandWobbliness;
+      float radiusNoise = amplitude * snoise(frequency * vec3(position_xz, 1.0));
       distanceToOrigin += radiusNoise;
 
       float mountainsDecayStart = beachWidth * 7.0;

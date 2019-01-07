@@ -23,7 +23,7 @@ export class Ocean extends THREE.Mesh
         request.send();
     };
 
-    constructor(scene, renderer, camera, light, controls) {
+    constructor(scene, renderer, camera, light, controls, GUIControls) {
         super();
 
         const numberOfLODS = 3;
@@ -36,10 +36,9 @@ export class Ocean extends THREE.Mesh
 
                 let uniforms = {
                     time: { type: "f", value: 10.0 },
+                    islandWobbliness: { type: "f", value: GUIControls.islandWobbliness },
                     islandRadius: { type: "f", value: 2.5 },
-                    beachWidth: { type: "f", value: 0.2 },
-                    lightPos: { type: "v3", value: light.position },
-                    cameraPos: { type: "v3", value: camera.position }
+                    beachWidth: { type: "f", value: 0.2 }
                 };
 
                 // Assign shader to material
@@ -77,28 +76,19 @@ export class Ocean extends THREE.Mesh
         // Update camera position and send to shaders when view changes
         controls.addEventListener( 'change', () => {
             this.LODNode.update(camera);
-            /*
-            if (this.island.material) {
-                // @ts-ignore
-                this.island.material.uniforms.cameraPos.value = this.cameraPosition;
-            }
-            */
         });
 
     }
 
-    update() {
+    update(amountWobbliness) {
+        // Update shader uniforms
         if (this.LODNode.children.length > 0) {
-            let currentMesh = this.LODNode.getObjectForDistance(this.camera.position.length());
+            let currentLODMesh = this.LODNode.getObjectForDistance(this.camera.position.length());
             // @ts-ignore
-            currentMesh.material.uniforms.time.value = this.clock.getElapsedTime();
-        }
-        /*
-        if (currentMesh) {
+            currentLODMesh.material.uniforms.time.value = this.clock.getElapsedTime();
             // @ts-ignore
-            currentMesh.material.uniforms.time.value = this.clock.getElapsedTime();
+            currentLODMesh.material.uniforms.islandWobbliness.value = amountWobbliness;
         }
-        */
     }
 
 }
