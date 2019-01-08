@@ -34,8 +34,8 @@ export class Ocean extends THREE.Mesh
         this.renderer = renderer;
         this.camera = camera;
 
-        loadShader('./src/shaders/water.vert', (vsErr, vsText) => { 
-            loadShader('./src/shaders/water.frag', (frErr, frText) => { 
+        loadShader('/src/shaders/water.vert', (vsErr, vsText) => { 
+            loadShader('/src/shaders/water.frag', (frErr, frText) => { 
 
                 let uniforms = {
                     time: { type: "f", value: 10.0 },
