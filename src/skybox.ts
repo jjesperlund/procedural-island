@@ -7,8 +7,8 @@ export class Sky
 
     constructor(scene) {
         
-        loadShader('/src/shaders/sky.vert', (vsErr, vsText) => { 
-            loadShader('/src/shaders/sky.frag', (frErr, frText) => { 
+        loadShader('src/shaders/sky.vert', (vsErr, vsText) => { 
+            loadShader('src/shaders/sky.frag', (frErr, frText) => { 
 
                 let skyUniforms = {
                     sunPosition: {type: "v3", value: new THREE.Vector3(10, 8, 1)}

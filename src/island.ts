@@ -12,8 +12,8 @@ export class Island
 
         this.camera = camera;
 
-        loadShader('/src/shaders/island.vert', (vsErr, vsText) => { 
-            loadShader('/src/shaders/island.frag', (frErr, frText) => { 
+        loadShader('src/shaders/island.vert', (vsErr, vsText) => { 
+            loadShader('src/shaders/island.frag', (frErr, frText) => { 
 
                 let uniforms = {
                     islandWobbliness: { type: "f", value: GUIControls.islandWobbliness },
