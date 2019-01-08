@@ -1,25 +1,14 @@
 
 import * as THREE from 'three'
+import loadShader from './utils/load-shader'
 
 export class Sky
  {
-    loadShader( path, callback ) {
-        var request = new XMLHttpRequest();
-        request.open('GET', path, true);
-        request.onload = function () {
-            if (request.status < 200 || request.status > 299) {
-                callback('Error: HTTP Status ' + request.status + ' on resource ' + path);
-            } else {
-                callback(null, request.responseText);
-            }
-        };
-        request.send();
-    };
 
     constructor(scene) {
         
-        this.loadShader('/src/shaders/sky.vert', (vsErr, vsText) => { 
-            this.loadShader('/src/shaders/sky.frag', (frErr, frText) => { 
+        loadShader('/src/shaders/sky.vert', (vsErr, vsText) => { 
+            loadShader('/src/shaders/sky.frag', (frErr, frText) => { 
 
                 let skyUniforms = {
                     sunPosition: {type: "v3", value: new THREE.Vector3(10, 8, 1)}

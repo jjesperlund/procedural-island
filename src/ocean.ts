@@ -1,5 +1,6 @@
 
 import * as THREE from 'three'
+import loadShader from './utils/load-shader'
 
 export class Ocean extends THREE.Mesh
  {
@@ -10,6 +11,7 @@ export class Ocean extends THREE.Mesh
     private renderer: any;
     private camera: any;
 
+    /*
     loadShader( path, callback ) {
         var request = new XMLHttpRequest();
         request.open('GET', path, true);
@@ -22,8 +24,9 @@ export class Ocean extends THREE.Mesh
         };
         request.send();
     };
+    */
 
-    constructor(scene, renderer, camera, light, controls, GUIControls) {
+    constructor(scene, renderer, camera, controls, GUIControls) {
         super();
 
         const numberOfLODS = 3;
@@ -31,8 +34,8 @@ export class Ocean extends THREE.Mesh
         this.renderer = renderer;
         this.camera = camera;
 
-        this.loadShader('/src/shaders/water.vert', (vsErr, vsText) => { 
-            this.loadShader('/src/shaders/water.frag', (frErr, frText) => { 
+        loadShader('./src/shaders/water.vert', (vsErr, vsText) => { 
+            loadShader('./src/shaders/water.frag', (frErr, frText) => { 
 
                 let uniforms = {
                     time: { type: "f", value: 10.0 },

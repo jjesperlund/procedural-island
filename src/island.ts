@@ -1,31 +1,19 @@
 
 import * as THREE from 'three'
+import loadShader from './utils/load-shader'
 
 export class Island
  {
     private LODNode: THREE.LOD = new THREE.LOD();
     private camera: any;
 
-    loadShader( path, callback ) {
-        var request = new XMLHttpRequest();
-        request.open('GET', path, true);
-        request.onload = function () {
-            if (request.status < 200 || request.status > 299) {
-                callback('Error: HTTP Status ' + request.status + ' on resource ' + path);
-            } else {
-                callback(null, request.responseText);
-            }
-        };
-        request.send();
-    };
-
     constructor(scene, camera, light, backgroundColor, controls, GUIControls) {
         const numberOfLODS = 3;
 
         this.camera = camera;
 
-        this.loadShader('/src/shaders/island.vert', (vsErr, vsText) => { 
-            this.loadShader('/src/shaders/island.frag', (frErr, frText) => { 
+        loadShader('/src/shaders/island.vert', (vsErr, vsText) => { 
+            loadShader('/src/shaders/island.frag', (frErr, frText) => { 
 
                 let uniforms = {
                     islandWobbliness: { type: "f", value: GUIControls.islandWobbliness },

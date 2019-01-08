@@ -49,7 +49,6 @@ export class Scene extends THREE.Scene {
             this, 
             renderer, 
             camera, 
-            this.light, 
             this.controls,
             this.GUIControls
         );
