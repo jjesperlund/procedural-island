@@ -4,7 +4,7 @@ import * as THREE from 'three'
 export class Renderer extends THREE.WebGLRenderer
  {
     constructor(container) {
-        super({antialias: false});
+        super({antialias: false}); //Aliasing is done manually in the fragments shaders
 
         // set size
         this.setSize(window.innerWidth, window.innerHeight)

@@ -108,33 +108,25 @@ varying vec3 vPosition;
 void main() {
 
     vec4 res_color;
-    vec4 skyColor = vec4(123.0/255.0, 170.0/255.0, 227.0/255.0, 1.0);
-    vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
-    vec4 oceanColor = vec4(0.05, 0.05, 0.70, 1.0);
-    vec4 sunColor = vec4(1.0, 1.0, 0.75, 1.0);
 
-    float horizonGradient_endY = 2.0;
-    float clouds_startY = 2.0;
-    float skyBoxRadius = 12.5;
+    const vec4 skyColor = vec4(123.0/255.0, 170.0/255.0, 227.0/255.0, 1.0);
+    const vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
+    const vec4 sunColor = vec4(1.0, 1.0, 0.75, 1.0);
+    const float horizonGradient_endY = 2.0;
+    const float clouds_startY = 2.0;
+    const float skyBoxRadius = 12.5;
 
-    float clouds = 0.9 * snoise(0.14 * vPosition); // + 0.75 * snoise(2.0 * vPosition);
+    float clouds = 0.9 * snoise(0.14 * vPosition);
     float cloudsTransition = smoothstep(0.1, 0.9, clouds);
     cloudsTransition *= smoothstep(clouds_startY, skyBoxRadius, abs(vPosition.y));
     res_color = mix(skyColor, horizonColor, cloudsTransition);
 
+    // Horizon gradient
     float horizon = smoothstep(0.0, horizonGradient_endY, abs(vPosition.y));
     res_color = mix(horizonColor, res_color, horizon);
 
-    // Fix antialiasing where horizon meets ocean by
-    // adding and aastepping a ocean colored line between
-    // (This because we don't have access to the resulting ocean color here)
-    /*
-    float horizonToOcean = aastep(0.1, abs(vPosition.y));
-    res_color = mix(oceanColor, res_color, horizonToOcean);
-    */
-
     // Sun
-    float sunRadius = 1.0;
+    const float sunRadius = 1.0;
     float distanceToSunCenter = length(vPosition - sunPosition);
 
     // Draw sun if distance to sun is less than sun radius and

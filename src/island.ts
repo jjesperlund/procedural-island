@@ -15,6 +15,7 @@ export class Island
         loadShader('src/shaders/island.vert', (vsErr, vsText) => { 
             loadShader('src/shaders/island.frag', (frErr, frText) => { 
 
+                // Define uniforms passed into the island shaders
                 let uniforms = {
                     islandWobbliness: { type: "f", value: GUIControls.islandWobbliness },
                     amountMountain: { type: "f", value: GUIControls.amountMountain },
@@ -39,6 +40,7 @@ export class Island
 
                 m.needsUpdate = true;
                     
+                // Add LOD meshes
                 for (var i = 0; i < numberOfLODS; i++) {
                     const g = new THREE.BoxBufferGeometry(6, 0.05, 6, 300 - i * 55, 1, 300 - i * 55);
                     var island = new THREE.Mesh(g, m);
@@ -65,6 +67,7 @@ export class Island
     }
 
     update(amountWobbliness, amountMountain) {
+        // Update shader uniforms with GUI values
         if (this.LODNode.children.length > 0) {
             let currentLODMesh = this.LODNode.getObjectForDistance(this.camera.position.length());
             // @ts-ignore  

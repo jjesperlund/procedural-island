@@ -99,7 +99,6 @@ varying float res_noise;
 varying float distanceToOrigin;
 varying float distanceToCamera;
 varying vec3 vWorldPosition;
-varying vec3 vNormal;
 varying vec3 vViewPosition;
 
 uniform vec3 backgroundColor;
@@ -112,15 +111,6 @@ uniform vec3 cameraPos;
 struct PointLight {
     vec3 position;
     vec3 color;
-    float distance;
-    float decay;
-
-    int shadow;
-    float shadowBias;
-    float shadowRadius;
-    vec2 shadowMapSize;
-    float shadowCameraNear;
-    float shadowCameraFar;
 };
 
 uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -135,13 +125,11 @@ vec4 computeLighting(vec3 vViewPosition, vec3 newNormal)
         float lightDistance = length(pointLights[l].position -  vViewPosition);
         vec3 lightDirection = normalize(pointLights[l].position -  vViewPosition);
 
-        // Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
-        // pointing in the same direction then it will get max illumination.
+        // Lambertian reflection 
         Kd = max(dot(newNormal, lightDirection), 0.0);
 
         // Add attenuation.
         Kd = Kd * (1.0 / (1.0 + (0.25 * lightDistance * lightDistance)));
-        //lightColor.rgb += clamp(dot(lightDirection, newNormal), 0.0, 1.0) * pointLights[l].color;
     }
 
     vec3 diffuseLighting = pointLights[0].color * Kd;
@@ -154,8 +142,7 @@ vec4 addVegetation(vec3 vWorldPosition, vec4 island_color, float noiseMult, floa
     float vegetationEnd= islandRadius - 0.7;
     float vegetationStart = islandRadius - beachWidth * 2.2;
 
-    float greensNoise = noiseMult * 0.5 * snoise(70.0 * freqMult * vWorldPosition); //+ 
-                        //noiseMult/ * snoise(150. * vWorldPosition);
+    float greensNoise = noiseMult * 0.5 * snoise(70.0 * freqMult * vWorldPosition);
     float greens_color_step = smoothstep(0.1, 0.9, greensNoise);
     vec4 greens1 = vec4(11.0/255.0, 56.0/255.0, 11.0/255.0, 1.0);
     vec4 greens2 = vec4(15.0/255.0, 63.0/255.0, 15.0/255.0, 1.0);
@@ -168,20 +155,17 @@ vec4 addVegetation(vec3 vWorldPosition, vec4 island_color, float noiseMult, floa
 
 void main() {
 
+    vec4 island_color;
+
+    // Mapping the noise amplitude and frequency to the viewing distance
     float maxCameraDistanceToOrigin = 14.0;
     float cameraDistanceToOrigin = length(cameraPos);
-    
-    // Mapping the noise gain and frequency to the viewing distance
     float noiseMultiplier = maxCameraDistanceToOrigin - cameraDistanceToOrigin;
     float freqMultiplier = noiseMultiplier * 0.5;
 
-    vec4 island_color;
-
-    // Calculate new normal for each facet after displacement
+    // Calculate new normal for each facet after displacement using partial derivatives
     vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
     
-    float islandEdge = smoothstep(islandRadius + beachWidth / 5.0, islandRadius - beachWidth / 5.0, distanceToOrigin);
-
     // Mountains
     vec4 mountain_color1 = vec4(93.0/255.0, 91.0/255.0, 86.0/255.0, 1.0);
     vec4 mountain_color2 = vec4(87.0/255.0, 85.0/255.0, 80.0/255.0, 1.0);
@@ -189,7 +173,7 @@ void main() {
     float color_step = smoothstep(0.1, 0.9, mountainNoise);
     island_color = mix(mountain_color1, mountain_color2, color_step);
 
-    // Tree forrest      
+    // Vegetation     
     island_color = addVegetation(vWorldPosition, island_color, noiseMultiplier, freqMultiplier);
 
     // Beach
@@ -203,7 +187,9 @@ void main() {
     float mountainBeachEdge = smoothstep(islandRadius - beachWidth/ 2.5, islandRadius - beachWidth, distanceToOrigin);
     island_color = mix(beach_color, island_color, mountainBeachEdge);
 
+    // Add lambertian reflection model to the island
     vec4 lighting = computeLighting(vViewPosition, newNormal);
+    
 
     gl_FragColor = island_color * lighting;
 

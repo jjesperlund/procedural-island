@@ -4,39 +4,20 @@ import loadShader from './utils/load-shader'
 
 export class Ocean extends THREE.Mesh
  {
-    private mesh: THREE.Mesh;
     private LODNode: THREE.LOD = new THREE.LOD();
     private clock: THREE.Clock = new THREE.Clock();
-    private scene: any;
-    private renderer: any;
     private camera: any;
-
-    /*
-    loadShader( path, callback ) {
-        var request = new XMLHttpRequest();
-        request.open('GET', path, true);
-        request.onload = function () {
-            if (request.status < 200 || request.status > 299) {
-                callback('Error: HTTP Status ' + request.status + ' on resource ' + path);
-            } else {
-                callback(null, request.responseText);
-            }
-        };
-        request.send();
-    };
-    */
 
     constructor(scene, renderer, camera, controls, GUIControls) {
         super();
 
         const numberOfLODS = 3;
-        this.scene = scene;
-        this.renderer = renderer;
         this.camera = camera;
 
         loadShader('src/shaders/water.vert', (vsErr, vsText) => { 
             loadShader('src/shaders/water.frag', (frErr, frText) => { 
 
+                // Shader uniforms passed into the ocean's shaders
                 let uniforms = {
                     time: { type: "f", value: 10.0 },
                     islandWobbliness: { type: "f", value: GUIControls.islandWobbliness },
@@ -58,13 +39,7 @@ export class Ocean extends THREE.Mesh
 
                 m.needsUpdate = true;
 
-                /*
-                let g = new THREE.BoxBufferGeometry(25, 0.2, 25, 150, 1, 150);
-
-                this.mesh = new THREE.Mesh(g, m);
-                //this.ocean.position.y = -0.05;
-                this.scene.add(this.mesh);    
-                */
+                // Add LOD meshes
                 for (var i = 0; i < numberOfLODS; i++) {
                     const g = new THREE.BoxBufferGeometry(25, 0.2, 25, 800 - i * 200, 1, 800 - i * 200);
                     var ocean = new THREE.Mesh(g, m);
@@ -84,7 +59,7 @@ export class Ocean extends THREE.Mesh
     }
 
     update(amountWobbliness) {
-        // Update shader uniforms
+        // Update shader uniforms each frame
         if (this.LODNode.children.length > 0) {
             let currentLODMesh = this.LODNode.getObjectForDistance(this.camera.position.length());
             // @ts-ignore

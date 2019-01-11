@@ -1,10 +1,8 @@
-
 import * as THREE from 'three'
 import loadShader from './utils/load-shader'
 
 export class Sky
  {
-
     constructor(scene) {
         
         loadShader('src/shaders/sky.vert', (vsErr, vsText) => { 
@@ -31,7 +29,5 @@ export class Sky
             });
         });
 
-
     }
-
 }

@@ -100,20 +100,10 @@ uniform float islandWobbliness;
 varying float noise;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
-varying vec3 vNormal;
 
 struct PointLight {
     vec3 position;
     vec3 color;
-    float distance;
-    float decay;
-
-    int shadow;
-    float shadowBias;
-    float shadowRadius;
-    vec2 shadowMapSize;
-    float shadowCameraNear;
-    float shadowCameraFar;
 };
 
 uniform PointLight pointLights[ NUM_POINT_LIGHTS ];
@@ -123,30 +113,31 @@ vec4 computeLighting(vec3 vViewPosition, vec3 N, float distanceToOrigin, float i
     float Kd;
     float Ka = 0.8;
     float Ks = 0.0;
-    float specularShininess = 120.0;
+    const float specularShininess = 120.0;
 
     vec3 ambientColor = vec3(1., 1., 1.);
     vec3 diffuseColor = pointLights[0].color;
     vec3 specularColor = ambientColor;
 
     for (int l = 0; l < NUM_POINT_LIGHTS; l++) {
-        // Will be used for attenuation.
+
+        // lightDistance will be used for attenuation
         float lightDistance = length(pointLights[l].position -  vViewPosition);
+
         vec3 L = normalize(pointLights[l].position -  vViewPosition);
 
-        // Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
-        // pointing in the same direction then it will get max illumination.
+        // Lambertian reflection
         Kd = max(dot(N, L), 0.0);
 
         // Add attenuation.
         Kd = Kd * (1.0 / (1.0 + (0.25 * lightDistance * lightDistance)));
         //lightColor.rgb += clamp(dot(L, N), 0.0, 1.0) * pointLights[l].color;
 
-        //Specular
+        //Phong reflection model
         if(Kd > 0.0) {
-          vec3 R = reflect(-L, N);      // Reflected light vector
+          vec3 R = reflect(-L, N);            // Reflected light vector
           vec3 V = normalize(-vViewPosition); // Vector to viewer
-          // Compute the specular term
+          // Compute the specular term and add shininess
           float specAngle = max(dot(R, V), 0.0);
           Ks = pow(specAngle, specularShininess);
         }
@@ -175,14 +166,15 @@ float aastep(float threshold, float value)
 
 void main() {
 
-  vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
+  const vec4 horizonColor = vec4(173.0/255.0, 220.0/255.0, 255.0/255.0, 1.0);
   vec4 lighting = vec4(1.0);
 
   /* --- Distance in xz-plane from position to plane origin ----------------------------------------- */
   vec2 position_xz = vPosition.xz;
   float distanceToOrigin = sqrt(dot(position_xz, position_xz));
 
-  // Add noise to island radius to not make the island perfectly circular
+  // Add noise to island radius to make the fragments computations
+  // follow the new island shape
   float frequency = islandWobbliness * 0.4;
   float amplitude = islandWobbliness;
   float radiusNoise = amplitude * snoise(frequency * vec3(position_xz, 1.0));
@@ -198,20 +190,20 @@ void main() {
   waterColor = mix(waterColor, shallowWaterColor, deepToShallow);
 
   // Water to foam transition
-  //float distanceToIslandEdge = abs(islandRadius - distanceToOrigin);
   float waterToFoam = smoothstep(islandRadius + 0.07, islandRadius, distanceToOrigin);
   waterColor = mix(waterColor, waterFoam, waterToFoam);
 
   float oceanToHorizon = aastep(12.4, sqrt(dot(position_xz, position_xz)));
   waterColor = mix(waterColor, horizonColor, oceanToHorizon);
 
-  // Calculate new normal for each facet after displacement
+  // Calculate new normal for each facet after displacement using partial derivatives
   vec3 newNormal = normalize(cross( dFdx( vViewPosition ), dFdy( vViewPosition ) ));
 
-    if (sqrt(dot(position_xz, position_xz)) < 12.4) 
-    {
-      lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
-    }
+  // Only add shading to the sea-part of the sea plane geometry
+  if (sqrt(dot(position_xz, position_xz)) < 12.4) 
+  {
+    lighting = computeLighting(vViewPosition, newNormal, distanceToOrigin, islandRadius);
+  }
 
   gl_FragColor = waterColor * lighting;
 

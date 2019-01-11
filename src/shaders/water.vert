@@ -109,7 +109,6 @@ uniform float time;
 varying float noise;
 varying vec3 vPosition;
 varying vec3 vViewPosition;
-varying vec3 vNormal;
 
 void main() {
 
@@ -117,23 +116,20 @@ void main() {
 
     vPosition = position;
 
-    //noise = abs(snoise(time * pos * 0.5));
+    // Calculate fluid noise, rotating gradient mapped to time variable
     noise = 0.1 * abs(srnoise(7.0 * vPosition.xz, noise_speed));
 
+    // No vertex translation in edge of sea, where sea meets skybox
+    // This reduces the aliasing in the sea-horizon edge
     noise *= step(0.3, 12.5 - sqrt(dot(vPosition.xz, vPosition.xz)));
 
     vPosition.y *= noise;
 
-    //Elevate ocean to hide island plane
+    //Elevate ocean for better waves where sea meets island beach
     vPosition.y += 0.01;
 
-    //Transform vertex into eye space
+    //Transform vertex into eye space, used for shading in fragment shader
     vViewPosition = vec3(modelViewMatrix * vec4( vPosition, 1.0 )); 
-    //Transform vertex normal into eye space to use for shading
-    vNormal = vec3(modelViewMatrix * vec4(normal, 0.0));
 
-
-    gl_Position = projectionMatrix *
-                modelViewMatrix *
-                vec4(vPosition,1.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(vPosition, 1.0);
 }

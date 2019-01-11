@@ -101,19 +101,18 @@ float snoise(vec3 v)
     varying float distanceToCamera;
     varying vec3 vWorldPosition;
     varying vec3 vViewPosition;
-    varying vec3 vNormal;
     
 
   void main() {
 
-    vNormal = normal;
+    vec3 vNormal = normal;
 
     // Only displace in positive y direction
     if (vNormal.y < 0.0) vNormal.y *= -1.0;
 
     distanceToCamera = length(cameraPos - vWorldPosition); 
 
-    /* --- Fundamental island noise ----------------------------------------- */
+    /* --- Fundamental island noise (mountains) -------------------------- */
       // Properties
       const int octaves = 3;
       float freq_multiplier = 2.0;
@@ -129,6 +128,7 @@ float snoise(vec3 v)
           frequency *= freq_multiplier;
           amplitude *= noise_gain;
       }
+
       res_noise += 0.3 + (amountMountain * 0.5);
 
       vWorldPosition.x = position.x;
@@ -151,7 +151,7 @@ float snoise(vec3 v)
       float vegetationEnd = islandRadius - 0.6;
       float vegetationStart = islandRadius - beachWidth * 1.5;
 
-      // Vegetation (tree forrest)      
+      /* --- Vegetation  ------------------------------------------------ */         
       float vegetation_noise = 0.6 * snoise(15.0 * position) + 0.2 * snoise(30.0 * position);
       float vegetation_step = 1.0 - smoothstep(vegetationStart, vegetationEnd, distanceToOrigin);
       vWorldPosition.y += (1.0 - vegetation_noise) * vegetation_step;
@@ -159,17 +159,16 @@ float snoise(vec3 v)
       // Smoothstep mountains to decay as the distance from origin increases
       vWorldPosition.y *= smoothstep(islandRadius - mountainsDecayStart/ 15.0, islandRadius - mountainsDecayStart, distanceToOrigin);
 
+      /* ---------------------------------------------------------------- */ 
+
       // Beach elevation decay to ocean
       vWorldPosition.y += 0.07; 
       vWorldPosition.y *= smoothstep(islandRadius + 0.05, islandRadius - beachWidth, distanceToOrigin);
 
-      //Transform vertex into eye space
+      //Transform vertex position into eye space, used when shading in fragment shader
       vViewPosition = vec3(modelViewMatrix * vec4( vWorldPosition, 1.0 )); 
-      //Transform vertex normal into eye space
-      vNormal = vec3(modelViewMatrix * vec4(vNormal, 0.0));
-
-      //vNormal = normalMatrix * vNormal; //normalMatrix is worldToObject
 
 
       gl_Position = projectionMatrix * modelViewMatrix * vec4(vWorldPosition, 1.0);
+
     }

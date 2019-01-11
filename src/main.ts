@@ -14,13 +14,14 @@ export class Main {
     private container: any;
     private stats: any;
     private controls: any;
+
     constructor(container) {
 
+        // Add FPS counter
         // @ts-ignore: Unreachable code error
         this.stats = new Stats();
         document.body.appendChild( this.stats.dom );
 
-        // // the HTML container
         this.container = container;
 
         // create the renderer
@@ -30,6 +31,7 @@ export class Main {
         const aspectRatio = this.renderer.domElement.width / this.renderer.domElement.height;
         this.camera = new Camera(aspectRatio);
 
+        // Add navigation controls
         this.controls = new OrbitControls(this.camera, this.renderer.domElement);
         this.controls.enabled = true;
         this.controls.maxDistance = 13;
@@ -46,8 +48,7 @@ export class Main {
         document.addEventListener('DOMContentLoaded', () => this.updateSize(), false);
         window.addEventListener('resize', () => this.updateSize(), false);
         
-        this.render()
-
+        this.render();
     
     }
 
@@ -56,9 +57,9 @@ export class Main {
         this.camera.updateProjectionMatrix();
     }
 
+    // Main rendering loop
     render(): void {
         this.stats.update();
-        //this.camera.update();
         this.scene.update();
         this.renderer.render(this.scene, this.camera)
         requestAnimationFrame(this.render.bind(this)); // Bind the main class instead of window object
